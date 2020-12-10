@@ -301,8 +301,8 @@ int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
 void PrintVersion()
 {
 	gEngfuncs.Con_Printf("\n||------------------------------------------||");
-	gEngfuncs.Con_Printf("\n  Half-Life: Zombies Ate My Neighbours %s (%s)", clientBuild, clientDate);
-	gEngfuncs.Con_Printf("\n  Phoenix Advanced Development Mod version %s", admVersion);
+	gEngfuncs.Con_Printf("\n  Half-Life: Zombies Ate My Neighbours %s (%s)", clientBuild);
+	gEngfuncs.Con_Printf("\n  Phoenix Advanced Development Mod version %s", admVersion, Date);
 	gEngfuncs.Con_Printf("\n  ADM Originally created by: %s", admAuthor);
 	gEngfuncs.Con_Printf("\n Phoenix ADM created by: %s", admModifier);
 	gEngfuncs.Con_Printf("\n  SDK: %s", admRepo);
