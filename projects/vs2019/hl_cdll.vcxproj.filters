@@ -768,6 +768,9 @@
     <ClInclude Include="..\..\common\winsani_out.h">
       <Filter>Sources\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\cl_dll\ADM\AdmVersionInfo.h">
+      <Filter>Sources\ADM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\game_controls.lib" />

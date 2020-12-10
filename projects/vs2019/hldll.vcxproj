@@ -15,6 +15,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>hldll</RootNamespace>
     <ProjectName>Game</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -44,7 +45,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\dlls\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\int\</IntDir>
-    <TargetName>hl</TargetName>
+    <TargetName>adm</TargetName>
     <IncludePath>..\..\dlls\bullet;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\dlls\bullet;$(LibraryPath)</LibraryPath>
   </PropertyGroup>

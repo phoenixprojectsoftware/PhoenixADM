@@ -229,6 +229,7 @@ call ..\..\filecopy.bat "$(TargetDir)$(TargetName).pdb" "$(ModDir)\cl_dlls\$(Tar
     <ClCompile Include="..\..\shared\ADM\Physics\PhysicsWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\cl_dll\ADM\AdmVersionInfo.h" />
     <ClInclude Include="..\..\cl_dll\ADM\Components\SimpleSky.h" />
     <ClInclude Include="..\..\cl_dll\ADM\Physics\BulletDebug_TriAPI.h" />
     <ClInclude Include="..\..\cl_dll\ADM\Sound\BaseSound.h" />

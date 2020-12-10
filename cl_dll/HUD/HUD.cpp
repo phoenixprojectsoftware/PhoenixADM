@@ -30,6 +30,7 @@
 #include "demo.h"
 #include "demo_api.h"
 #include "VGUI/vgui_ScorePanel.h"
+#include "ADM\AdmVersionInfo.h"
 
 //#include "../shared/ADM/AdmSound.h"
 
@@ -296,6 +297,18 @@ int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
 //	return gHUD.MsgFunc_ADMSIPlay(pszName, iSize, pbuf);
 //}
 
+
+void PrintVersion()
+{
+	gEngfuncs.Con_Printf("\n||------------------------------------------||");
+	gEngfuncs.Con_Printf("\n  Half-Life: Zombies Ate My Neighbours %s (%s)", clientBuild, clientDate);
+	gEngfuncs.Con_Printf("\n  Phoenix Advanced Development Mod version %s", admVersion);
+	gEngfuncs.Con_Printf("\n  ADM Originally created by: %s", admAuthor);
+	gEngfuncs.Con_Printf("\n Phoenix ADM created by: %s", admModifier);
+	gEngfuncs.Con_Printf("\n  SDK: %s", admRepo);
+	gEngfuncs.Con_Printf("\n||------------------------------------------||");
+}
+
 // CVars
 
 cvar_t* adm_hud_r;
@@ -419,6 +432,8 @@ void CHud :: Init( void )
 	adm_bob_height			= CVAR_CREATE("adm_bob_height",			"2", FCVAR_ARCHIVE);
 
 	adm_classicbob_enable	= CVAR_CREATE("adm_classicbob_enable",	"1", FCVAR_ARCHIVE);
+
+	gEngfuncs.pfnAddCommand("version_adm", PrintVersion);
 
 	adm_cam_sway			= CVAR_CREATE("adm_cam_sway",			"1", FCVAR_ARCHIVE);
 	adm_cam_roll			= CVAR_CREATE("adm_cam_roll",			"0.5", FCVAR_ARCHIVE);
