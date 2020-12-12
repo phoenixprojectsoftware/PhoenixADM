@@ -60,7 +60,7 @@ int CHudAmmoSecondary :: Draw(float flTime)
 
 	// draw secondary ammo icons above normal ammo readout
 	int a, x, y, r, g, b, AmmoWidth;
-	UnpackRGB( r, g, b, RGB_YELLOWISH );
+	UnpackRGB( r, g, b, RGB_DEFAULT );
 	a = (int) V_max( MIN_ALPHA, m_fFade );
 	a *= CVAR_GET_FLOAT("adm_hud_a");
 	if (m_fFade > 0)

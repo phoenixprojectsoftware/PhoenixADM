@@ -192,7 +192,7 @@ inline void UnpackRGB(int &r, int &g, int &b, unsigned long ulRGB)\
 // AdmSrc - New customisable HUD colour unpacking
 inline void UnpackRGB(int &r, int &g, int &b, unsigned long ulRGB)
 {
-	if (ulRGB == RGB_YELLOWISH)
+	if (ulRGB == RGB_DEFAULT)
 	{
 		r = CVAR_GET_FLOAT("adm_hud_r");
 		g = CVAR_GET_FLOAT("adm_hud_g");

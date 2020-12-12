@@ -156,7 +156,7 @@ void CHudHealth::GetPainColor( int &r, int &g, int &b )
 #else
 	if (m_iHealth > 10)
 	{
-		UnpackRGB(r,g,b, RGB_YELLOWISH);
+		UnpackRGB(r,g,b, RGB_DEFAULT);
 	}
 	else
 	{
@@ -504,7 +504,7 @@ int CHudHealth::DrawDamage(float flTime)
 	if (!m_bitsDamage)
 		return 1;
 
-	UnpackRGB(r,g,b, RGB_YELLOWISH);
+	UnpackRGB(r,g,b, RGB_DEFAULT);
 	
 	a = (int)( fabs(sin(flTime*2)) * 256.0);
 	a *= CVAR_GET_FLOAT("adm_hud_a");

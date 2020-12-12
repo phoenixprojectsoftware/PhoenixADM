@@ -165,6 +165,7 @@ call ..\..\filecopy.bat "$(TargetDir)$(TargetName).pdb" "$(ModDir)\dlls\$(Target
     <ClCompile Include="..\..\dlls\AI\Monsters\Scientist.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\Tentacle.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\Turrets.cpp" />
+    <ClCompile Include="..\..\dlls\AI\Monsters\ZAMN_Zombie.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\Zombie.cpp" />
     <ClCompile Include="..\..\dlls\AI\Schedule.cpp" />
     <ClCompile Include="..\..\dlls\AI\SquadMonster.cpp" />
