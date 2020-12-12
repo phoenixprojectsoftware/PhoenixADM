@@ -116,8 +116,8 @@ public:
 // weapon clip/carry ammo capacities
 #define URANIUM_MAX_CARRY		200
 #define	_9MM_MAX_CARRY			500
-#define _357_MAX_CARRY			36
-#define BUCKSHOT_MAX_CARRY		125
+#define _357_MAX_CARRY				100
+#define BUCKSHOT_MAX_CARRY	125
 #define BOLT_MAX_CARRY			50
 #define ROCKET_MAX_CARRY		5
 #define HANDGRENADE_MAX_CARRY	10
@@ -149,7 +149,7 @@ public:
 
 // the default amount of ammo that comes with each gun when it spawns
 #define GLOCK_DEFAULT_GIVE			18
-#define PYTHON_DEFAULT_GIVE			6
+#define PYTHON_DEFAULT_GIVE			50
 #define MP5_DEFAULT_GIVE			50
 #define MP5_DEFAULT_AMMO			50
 #define MP5_M203_DEFAULT_GIVE		0
