@@ -188,7 +188,7 @@ FMOD_VECTOR VectorToFMODVectorDirect( const Vector& vec )
 // refugees from view.cpp
 extern vec3_t v_origin;
 extern vec3_t v_angles;
-vec3_t v_velocity;
+extern vec3_t v_velocity;
 extern float v_frametime;
 
 /*
