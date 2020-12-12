@@ -1727,7 +1727,6 @@ void DLLEXPORT V_CalcRefdef(struct ref_params_s* pparams)
 	else if (!pparams->paused)
 	{
 		V_CalcNormalRefdef(pparams);
-		gFog.V_CalcRefDef(pparams);
 	}
 
 	/*
