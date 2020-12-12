@@ -22,9 +22,6 @@
 #include "Exports.h"
 // #include "fog.h" Planning on adding fog soon!
 
-#include "SDL2/SDL.h"
-#include "ADM/System/SDLWrapper.h"
-
 
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
@@ -74,7 +71,7 @@ extern cvar_t* cl_vsmoothing;
 #define	CAM_MODE_RELAX		1
 #define CAM_MODE_FOCUS		2
 
-vec3_t		v_origin, v_angles, v_cl_angles, v_sim_org, v_lastAngles, v_velocity;
+vec3_t		v_origin, v_angles, v_cl_angles, v_sim_org, v_lastAngles;
 float		v_frametime, v_lastDistance;
 float		v_cameraRelaxAngle = 5.0f;
 float		v_cameraFocusAngle = 35.0f;
@@ -750,15 +747,172 @@ V_CalcRefdef
 
 ==================
 */
-
-
-/*void V_CalcNormalRefdef( struct ref_params_s* pparams )
+void V_CalcNormalRefdef(struct ref_params_s* pparams)
 {
-	v_velocity = pparams->simvel;
+	cl_entity_t* ent, * view;
+	int				i;
 
-	V_CalcRefdef ( pparams );
-	//V_CalcRefdef_ADM( pparams );
-}*/
+	vec3_t camAngles, camForward, camRight, camUp;
+
+	V_DriftPitch(pparams);
+
+	if (gEngfuncs.IsSpectateOnly())
+	{
+		ent = gEngfuncs.GetEntityByIndex(g_iUser2);
+	}
+	else
+	{
+		// ent is the player model ( visible when out of body )
+		ent = gEngfuncs.GetLocalPlayer();
+	}
+
+	// view is the weapon model (only visible from inside body )
+	view = gEngfuncs.GetViewModel();
+
+	// transform the view offset by the model's matrix to get the offset from
+	// model origin for the view
+
+	// add view height
+	VectorAdd(pparams->simorg, pparams->viewheight, pparams->vieworg);
+
+	VectorCopy(pparams->cl_viewangles, pparams->viewangles);
+
+	gEngfuncs.V_CalcShake();
+	gEngfuncs.V_ApplyShake(pparams->vieworg, pparams->viewangles, 1.0);
+
+	float waterOffset = V_CalcWaterOffsetHack(pparams);
+	pparams->vieworg[2] += waterOffset;
+
+	V_CalcViewRoll(pparams);
+
+	V_AddIdle(pparams);
+
+	// offsets
+	vec3_t angles = pparams->cl_viewangles;
+
+	AngleVectors(angles, pparams->forward, pparams->right, pparams->up);
+
+	// don't allow cheats in multiplayer
+	if (pparams->maxclients <= 1)
+	{
+		for (i = 0; i < 3; i++)
+		{
+			pparams->vieworg[i] += scr_ofsx->value * pparams->forward[i] + scr_ofsy->value * pparams->right[i] + scr_ofsz->value * pparams->up[i];
+		}
+	}
+
+	// Treating cam_ofs[2] as the distance
+	if (CL_IsThirdPerson())
+	{
+		vec3_t ofs;
+
+		ofs[0] = ofs[1] = ofs[2] = 0.0;
+
+		CL_CameraOffset((float*)&ofs);
+
+		VectorCopy(ofs, camAngles);
+		camAngles[ROLL] = 0;
+
+		AngleVectors(camAngles, camForward, camRight, camUp);
+
+		for (i = 0; i < 3; i++)
+		{
+			pparams->vieworg[i] += -ofs[2] * camForward[i];
+		}
+	}
+
+	// Give gun our viewangles
+	VectorCopy(pparams->cl_viewangles, view->angles);
+
+	// set up gun position
+	V_CalcGunAngle(pparams);
+
+	// Use predicted origin as view origin.
+	VectorCopy(pparams->simorg, view->origin);
+	view->origin[2] += (waterOffset);
+	VectorAdd(view->origin, pparams->viewheight, view->origin);
+
+	// Let the viewmodel shake at about 10% of the amplitude
+	gEngfuncs.V_ApplyShake(view->origin, view->angles, 0.9);
+
+	V_ApplyBob(pparams, view);
+
+	// pushing the view origin down off of the same X/Z plane as the ent's origin will give the
+	// gun a very nice 'shifting' effect when the player looks up/down. If there is a problem
+	// with view model distortion, this may be a cause. (SJB). 
+	view->origin[2] -= 1;
+
+	// fudge position around to keep amount of weapon visible
+	// roughly equal with different FOV
+	if (pparams->viewsize == 110)
+	{
+		view->origin[2] += 1;
+	}
+	else if (pparams->viewsize == 100)
+	{
+		view->origin[2] += 2;
+	}
+	else if (pparams->viewsize == 90)
+	{
+		view->origin[2] += 1;
+	}
+	else if (pparams->viewsize == 80)
+	{
+		view->origin[2] += 0.5;
+	}
+
+	// Add in the punchangle, if any
+	VectorAdd(pparams->viewangles, pparams->punchangle, pparams->viewangles);
+
+	// Include client side punch, too
+	VectorAdd(pparams->viewangles, (float*)&ev_punchangle, pparams->viewangles);
+
+	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
+
+	V_ApplySmoothing(pparams, view);
+
+	// Store off v_angles before munging for third person
+	v_angles = pparams->viewangles;
+	v_lastAngles = pparams->viewangles;
+	//	v_cl_angles = pparams->cl_viewangles;	// keep old user mouse angles !
+	if (CL_IsThirdPerson())
+	{
+		VectorCopy(camAngles, pparams->viewangles);
+		float pitch = camAngles[0];
+
+		// Normalize angles
+		if (pitch > 180)
+			pitch -= 360.0;
+		else if (pitch < -180)
+			pitch += 360;
+
+		// Player pitch is inverted
+		pitch /= -3.0;
+
+		// Slam local player's pitch value
+		ent->angles[0] = pitch;
+		ent->curstate.angles[0] = pitch;
+		ent->prevstate.angles[0] = pitch;
+		ent->latched.prevangles[0] = pitch;
+	}
+
+	// override all previous settings if the viewent isn't the client
+	if (pparams->viewentity > pparams->maxclients)
+	{
+		cl_entity_t* viewentity;
+		viewentity = gEngfuncs.GetEntityByIndex(pparams->viewentity);
+		if (viewentity)
+		{
+			VectorCopy(viewentity->origin, pparams->vieworg);
+			VectorCopy(viewentity->angles, pparams->viewangles);
+
+			// Store off overridden viewangles
+			v_angles = pparams->viewangles;
+		}
+	}
+
+	v_origin = pparams->vieworg;
+}
 
 void V_SmoothInterpolateAngles(float* startAngle, float* endAngle, float* finalAngle, float degreesPerSec)
 {
