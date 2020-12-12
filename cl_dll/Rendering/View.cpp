@@ -468,8 +468,8 @@ V_CalcViewRoll
 Roll is induced by movement and damage
 ==============
 */
-extern cvar_t* cl_rollangle;
-extern cvar_t* cl_rollspeed;
+cvar_t* cl_rollangle;
+cvar_t* cl_rollspeed;
 void V_CalcViewRoll(struct ref_params_s* pparams)
 {
 	float		side;
