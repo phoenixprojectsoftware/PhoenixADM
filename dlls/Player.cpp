@@ -1686,8 +1686,8 @@ void CBasePlayer::Jump()
 	// jump velocity is sqrt( height * gravity * 2)
 
 	// If this isn't the first frame pressing the jump button, break out.
-	if ( !FBitSet( m_afButtonPressed, IN_JUMP ) )
-		return;         // don't pogo stick
+	/*if ( !FBitSet( m_afButtonPressed, IN_JUMP ) )
+		return;         // don't pogo stick*/
 
 	if ( !(pev->flags & FL_ONGROUND) || !pev->groundentity )
 	{
