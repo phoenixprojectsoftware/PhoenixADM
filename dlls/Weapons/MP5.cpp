@@ -22,6 +22,7 @@
 #include "player.h"
 #include "soundent.h"
 #include "Game/GameRules.h"
+#include "Game/Game.h"
 
 enum mp5_e
 {
@@ -127,6 +128,9 @@ BOOL CMP5::Deploy( )
 
 void CMP5::PrimaryAttack()
 {
+	#ifndef CLIENT_DLL
+		int mp5OldRate = mp5_old_rate.value;
+	#endif
 	// don't fire underwater
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
@@ -185,10 +189,11 @@ void CMP5::PrimaryAttack()
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.1);
+	m_flNextPrimaryAttack = GetNextAttackDelay(0.08);
 
-	if ( m_flNextPrimaryAttack < UTIL_WeaponTimeBase() )
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
+	if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
+		if (mp5_old_rate.value == 0) m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
+		if (mp5_old_rate.value == 1) m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.08;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 );
 }
