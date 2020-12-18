@@ -165,7 +165,7 @@ public:
 #define HIVEHAND_DEFAULT_GIVE		8
 
 // The amount of ammo given to a player by an ammo item.
-#define AMMO_URANIUMBOX_GIVE	20
+#define AMMO_URANIUMBOX_GIVE	80
 #define AMMO_GLOCKCLIP_GIVE		GLOCK_MAX_CLIP
 #define AMMO_357BOX_GIVE		PYTHON_MAX_CLIP
 #define AMMO_MP5CLIP_GIVE		MP5_MAX_CLIP
