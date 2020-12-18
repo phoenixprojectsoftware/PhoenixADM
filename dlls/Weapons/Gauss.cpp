@@ -144,16 +144,16 @@ void CGauss::Holster( int skiplocal /* = 0 */ )
 void CGauss::PrimaryAttack()
 {
 	// don't fire underwater
-	if ( m_pPlayer->pev->waterlevel == 3 )
+	if (m_pPlayer->pev->waterlevel == 3)
 	{
-		PlayEmptySound( );
+		PlayEmptySound();
 		m_flNextSecondaryAttack = m_flNextPrimaryAttack = GetNextAttackDelay(0.15);
 		return;
 	}
 
-	if ( m_pPlayer->m_rgAmmo[ m_iPrimaryAmmoType ] < 2 )
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 2)
 	{
-		PlayEmptySound( );
+		PlayEmptySound();
 		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;
 		return;
 	}
@@ -166,7 +166,7 @@ void CGauss::PrimaryAttack()
 	StartFire();
 	m_fInAttack = 0;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0;
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.2;
+	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.1;
 }
 
 void CGauss::SecondaryAttack()
