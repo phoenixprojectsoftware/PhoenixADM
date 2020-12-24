@@ -192,8 +192,10 @@ void CMP5::PrimaryAttack()
 	m_flNextPrimaryAttack = GetNextAttackDelay(0.08);
 
 	if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
+#ifndef CLIENT_DLL
 		if (mp5_old_rate.value == 0) m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
 		if (mp5_old_rate.value == 1) m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.08;
+#endif
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 );
 }
