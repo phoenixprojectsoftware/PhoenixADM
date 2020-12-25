@@ -13,7 +13,7 @@
 *
 ****/
 //=========================================================
-// hgrunt
+// Combat Scientist - A scientist with a gun?!
 //=========================================================
 
 //=========================================================
@@ -36,7 +36,7 @@
 #include	"AI/Schedule.h"
 #include	"Base/Animation.h"
 #include	"AI/SquadMonster.h"
-#include	"Weapons/Weapons.h"
+#include "Weapons/Weapons.h"
 #include	"AI/TalkMonster.h"
 #include	"soundent.h"
 #include	"effects.h"
@@ -74,13 +74,29 @@ extern DLL_GLOBAL int		g_iSkillLevel;
 #define GUN_MP5						0
 #define GUN_SHOTGUN					1
 #define GUN_NONE					2
+
+//=========================================================
+// Monster's Anim Events Go Here
+//=========================================================
+#define		HGRUNT_AE_RELOAD		( 2 )
+#define		HGRUNT_AE_KICK			( 3 )
+#define		HGRUNT_AE_BURST1		( 4 )
+#define		HGRUNT_AE_BURST2		( 5 ) 
+#define		HGRUNT_AE_BURST3		( 6 ) 
+#define		HGRUNT_AE_GREN_TOSS		( 7 )
+#define		HGRUNT_AE_GREN_LAUNCH	( 8 )
+#define		HGRUNT_AE_GREN_DROP		( 9 )
+#define		HGRUNT_AE_CAUGHT_ENEMY	( 10) // grunt established sight with an enemy (player only) that had previously eluded the squad.
+#define		HGRUNT_AE_DROP_GUN		( 11) // grunt (probably dead) is dropping his mp5.
 */
 
 
+//=========================================================
+// monster-specific conditions
+//=========================================================
+// #define bits_COND_GRUNT_NOFIRE	( bits_COND_SPECIAL1 ) — see MilitaryWeapons.h
 
-
-
-class CHGrunt : public CSquadMonster
+class CCombatScientist : public CSquadMonster
 {
 public:
 	void Spawn( void );
@@ -147,27 +163,27 @@ public:
 	static const char *pGruntSentences[];
 };
 
-LINK_ENTITY_TO_CLASS( monster_human_grunt, CHGrunt );
+LINK_ENTITY_TO_CLASS( monster_scientist_combat, CCombatScientist );
 
-TYPEDESCRIPTION	CHGrunt::m_SaveData[] = 
+TYPEDESCRIPTION	CCombatScientist::m_SaveData[] = 
 {
-	DEFINE_FIELD( CHGrunt, m_flNextGrenadeCheck, FIELD_TIME ),
-	DEFINE_FIELD( CHGrunt, m_flNextPainTime, FIELD_TIME ),
-//	DEFINE_FIELD( CHGrunt, m_flLastEnemySightTime, FIELD_TIME ), // don't save, go to zero
-	DEFINE_FIELD( CHGrunt, m_vecTossVelocity, FIELD_VECTOR ),
-	DEFINE_FIELD( CHGrunt, m_fThrowGrenade, FIELD_BOOLEAN ),
-	DEFINE_FIELD( CHGrunt, m_fStanding, FIELD_BOOLEAN ),
-	DEFINE_FIELD( CHGrunt, m_fFirstEncounter, FIELD_BOOLEAN ),
-	DEFINE_FIELD( CHGrunt, m_cClipSize, FIELD_INTEGER ),
-	DEFINE_FIELD( CHGrunt, m_voicePitch, FIELD_INTEGER ),
+	DEFINE_FIELD( CCombatScientist, m_flNextGrenadeCheck, FIELD_TIME ),
+	DEFINE_FIELD( CCombatScientist, m_flNextPainTime, FIELD_TIME ),
+//	DEFINE_FIELD( CCombatScientist, m_flLastEnemySightTime, FIELD_TIME ), // don't save, go to zero
+	DEFINE_FIELD( CCombatScientist, m_vecTossVelocity, FIELD_VECTOR ),
+	DEFINE_FIELD( CCombatScientist, m_fThrowGrenade, FIELD_BOOLEAN ),
+	DEFINE_FIELD( CCombatScientist, m_fStanding, FIELD_BOOLEAN ),
+	DEFINE_FIELD( CCombatScientist, m_fFirstEncounter, FIELD_BOOLEAN ),
+	DEFINE_FIELD( CCombatScientist, m_cClipSize, FIELD_INTEGER ),
+	DEFINE_FIELD( CCombatScientist, m_voicePitch, FIELD_INTEGER ),
 //  DEFINE_FIELD( CShotgun, m_iBrassShell, FIELD_INTEGER ),
 //  DEFINE_FIELD( CShotgun, m_iShotgunShell, FIELD_INTEGER ),
-	DEFINE_FIELD( CHGrunt, m_iSentence, FIELD_INTEGER ),
+	DEFINE_FIELD( CCombatScientist, m_iSentence, FIELD_INTEGER ),
 };
 
-IMPLEMENT_SAVERESTORE( CHGrunt, CSquadMonster );
+IMPLEMENT_SAVERESTORE( CCombatScientist, CSquadMonster );
 
-const char *CHGrunt::pGruntSentences[] = 
+const char *CCombatScientist::pGruntSentences[] = 
 {
 	"HG_GREN", // grenade scared grunt
 	"HG_ALERT", // sees player
@@ -202,7 +218,7 @@ enum
 // may still fail but in most cases, well after the grunt has 
 // started moving.
 //=========================================================
-void CHGrunt :: SpeakSentence( void )
+void CCombatScientist :: SpeakSentence( void )
 {
 	if ( m_iSentence == HGRUNT_SENT_NONE )
 	{
@@ -221,7 +237,7 @@ void CHGrunt :: SpeakSentence( void )
 // IRelationship - overridden because Alien Grunts are 
 // Human Grunt's nemesis.
 //=========================================================
-int CHGrunt::IRelationship ( CBaseEntity *pTarget )
+int CCombatScientist::IRelationship ( CBaseEntity *pTarget )
 {
 	if ( FClassnameIs( pTarget->pev, "monster_alien_grunt" ) || ( FClassnameIs( pTarget->pev,  "monster_gargantua" ) ) )
 	{
@@ -234,7 +250,7 @@ int CHGrunt::IRelationship ( CBaseEntity *pTarget )
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void CHGrunt :: GibMonster ( void )
+void CCombatScientist :: GibMonster ( void )
 {
 	Vector	vecGunPos;
 	Vector	vecGunAngles;
@@ -277,7 +293,7 @@ void CHGrunt :: GibMonster ( void )
 // hear the DANGER sound that is made by hand grenades and
 // other dangerous items.
 //=========================================================
-int CHGrunt :: ISoundMask ( void )
+int CCombatScientist :: ISoundMask ( void )
 {
 	return	bits_SOUND_WORLD	|
 			bits_SOUND_COMBAT	|
@@ -288,7 +304,7 @@ int CHGrunt :: ISoundMask ( void )
 //=========================================================
 // someone else is talking - don't speak
 //=========================================================
-BOOL CHGrunt :: FOkToSpeak( void )
+BOOL CCombatScientist :: FOkToSpeak( void )
 {
 // if someone else is talking, don't speak
 	if (gpGlobals->time <= CTalkMonster::g_talkWaitTime)
@@ -312,7 +328,7 @@ BOOL CHGrunt :: FOkToSpeak( void )
 
 //=========================================================
 //=========================================================
-void CHGrunt :: JustSpoke( void )
+void CCombatScientist :: JustSpoke( void )
 {
 	CTalkMonster::g_talkWaitTime = gpGlobals->time + RANDOM_FLOAT(1.5, 2.0);
 	m_iSentence = HGRUNT_SENT_NONE;
@@ -322,7 +338,7 @@ void CHGrunt :: JustSpoke( void )
 // PrescheduleThink - this function runs after conditions
 // are collected and before scheduling code is run.
 //=========================================================
-void CHGrunt :: PrescheduleThink ( void )
+void CCombatScientist :: PrescheduleThink ( void )
 {
 	if ( InSquad() && m_hEnemy != NULL )
 	{
@@ -354,7 +370,7 @@ void CHGrunt :: PrescheduleThink ( void )
 // this is a bad bug. Friendly machine gun fire avoidance
 // will unecessarily prevent the throwing of a grenade as well.
 //=========================================================
-BOOL CHGrunt :: FCanCheckAttacks ( void )
+BOOL CCombatScientist :: FCanCheckAttacks ( void )
 {
 	if ( !HasConditions( bits_COND_ENEMY_TOOFAR ) )
 	{
@@ -370,7 +386,7 @@ BOOL CHGrunt :: FCanCheckAttacks ( void )
 //=========================================================
 // CheckMeleeAttack1
 //=========================================================
-BOOL CHGrunt :: CheckMeleeAttack1 ( float flDot, float flDist )
+BOOL CCombatScientist :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
 	CBaseMonster *pEnemy;
 
@@ -401,7 +417,7 @@ BOOL CHGrunt :: CheckMeleeAttack1 ( float flDot, float flDist )
 // occluded (throw grenade over wall, etc). We must 
 // disqualify the machine gun attack if the enemy is occluded.
 //=========================================================
-BOOL CHGrunt :: CheckRangeAttack1 ( float flDot, float flDist )
+BOOL CCombatScientist :: CheckRangeAttack1 ( float flDot, float flDist )
 {
 	if ( !HasConditions( bits_COND_ENEMY_OCCLUDED ) && flDist <= 2048 && flDot >= 0.5 && NoFriendlyFire() )
 	{
@@ -431,7 +447,7 @@ BOOL CHGrunt :: CheckRangeAttack1 ( float flDot, float flDist )
 // CheckRangeAttack2 - this checks the Grunt's grenade
 // attack. 
 //=========================================================
-BOOL CHGrunt :: CheckRangeAttack2 ( float flDot, float flDist )
+BOOL CCombatScientist :: CheckRangeAttack2 ( float flDot, float flDist )
 {
 	if (! FBitSet(pev->weapons, (HGRUNT_HANDGRENADE | HGRUNT_GRENADELAUNCHER)))
 	{
@@ -561,7 +577,7 @@ BOOL CHGrunt :: CheckRangeAttack2 ( float flDot, float flDist )
 //=========================================================
 // TraceAttack - make sure we're not taking it in the helmet
 //=========================================================
-void CHGrunt :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType)
+void CCombatScientist :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType)
 {
 	// check for helmet shot
 	if (ptr->iHitgroup == 11)
@@ -589,7 +605,7 @@ void CHGrunt :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecD
 // needs to forget that he is in cover if he's hurt. (Obviously
 // not in a safe place anymore).
 //=========================================================
-int CHGrunt :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
+int CCombatScientist :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
 {
 	Forget( bits_MEMORY_INCOVER );
 
@@ -600,7 +616,7 @@ int CHGrunt :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, floa
 // SetYawSpeed - allows each sequence to have a different
 // turn rate associated with it.
 //=========================================================
-void CHGrunt :: SetYawSpeed ( void )
+void CCombatScientist :: SetYawSpeed ( void )
 {
 	int ys;
 
@@ -643,7 +659,7 @@ void CHGrunt :: SetYawSpeed ( void )
 	pev->yaw_speed = ys;
 }
 
-void CHGrunt :: IdleSound( void )
+void CCombatScientist :: IdleSound( void )
 {
 	if (FOkToSpeak() && (g_fGruntQuestion || RANDOM_LONG(0,1)))
 	{
@@ -686,7 +702,7 @@ void CHGrunt :: IdleSound( void )
 // CheckAmmo - overridden for the grunt because he actually
 // uses ammo! (base class doesn't)
 //=========================================================
-void CHGrunt :: CheckAmmo ( void )
+void CCombatScientist :: CheckAmmo ( void )
 {
 	if ( m_cAmmoLoaded <= 0 )
 	{
@@ -698,14 +714,14 @@ void CHGrunt :: CheckAmmo ( void )
 // Classify - indicates this monster's place in the 
 // relationship table.
 //=========================================================
-int	CHGrunt :: Classify ( void )
+int	CCombatScientist :: Classify ( void )
 {
-	return	CLASS_HUMAN_MILITARY;
+	return	CLASS_PLAYER_ALLY;
 }
 
 //=========================================================
 //=========================================================
-CBaseEntity *CHGrunt :: Kick( void )
+CBaseEntity *CCombatScientist :: Kick( void )
 {
 	TraceResult tr;
 
@@ -729,7 +745,7 @@ CBaseEntity *CHGrunt :: Kick( void )
 // GetGunPosition	return the end of the barrel
 //=========================================================
 
-Vector CHGrunt :: GetGunPosition( )
+Vector CCombatScientist :: GetGunPosition( )
 {
 	if (m_fStanding )
 	{
@@ -744,7 +760,7 @@ Vector CHGrunt :: GetGunPosition( )
 //=========================================================
 // Shoot
 //=========================================================
-void CHGrunt :: Shoot ( void )
+void CCombatScientist :: Shoot ( void )
 {
 	if (m_hEnemy == NULL)
 	{
@@ -771,7 +787,7 @@ void CHGrunt :: Shoot ( void )
 //=========================================================
 // Shoot
 //=========================================================
-void CHGrunt :: Shotgun ( void )
+void CCombatScientist :: Shotgun ( void )
 {
 	if (m_hEnemy == NULL)
 	{
@@ -799,7 +815,7 @@ void CHGrunt :: Shotgun ( void )
 // HandleAnimEvent - catches the monster-specific messages
 // that occur when tagged animation frames are played.
 //=========================================================
-void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
+void CCombatScientist :: HandleAnimEvent( MonsterEvent_t *pEvent )
 {
 	Vector	vecShootDir;
 	Vector	vecShootOrigin;
@@ -936,7 +952,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 //=========================================================
 // Spawn
 //=========================================================
-void CHGrunt :: Spawn()
+void CCombatScientist :: Spawn()
 {
 	Precache( );
 
@@ -1003,7 +1019,7 @@ void CHGrunt :: Spawn()
 //=========================================================
 // Precache - precaches all resources this monster needs
 //=========================================================
-void CHGrunt :: Precache()
+void CCombatScientist :: Precache()
 {
 	PRECACHE_MODEL("models/hgrunt.mdl");
 
@@ -1041,7 +1057,7 @@ void CHGrunt :: Precache()
 //=========================================================
 // start task
 //=========================================================
-void CHGrunt :: StartTask ( Task_t *pTask )
+void CCombatScientist :: StartTask ( Task_t *pTask )
 {
 	m_iTaskStatus = TASKSTATUS_RUNNING;
 
@@ -1092,7 +1108,7 @@ void CHGrunt :: StartTask ( Task_t *pTask )
 //=========================================================
 // RunTask
 //=========================================================
-void CHGrunt :: RunTask ( Task_t *pTask )
+void CCombatScientist :: RunTask ( Task_t *pTask )
 {
 	switch ( pTask->iTask )
 	{
@@ -1119,7 +1135,7 @@ void CHGrunt :: RunTask ( Task_t *pTask )
 //=========================================================
 // PainSound
 //=========================================================
-void CHGrunt :: PainSound ( void )
+void CCombatScientist :: PainSound ( void )
 {
 	if ( gpGlobals->time > m_flNextPainTime )
 	{
@@ -1161,7 +1177,7 @@ void CHGrunt :: PainSound ( void )
 //=========================================================
 // DeathSound 
 //=========================================================
-void CHGrunt :: DeathSound ( void )
+void CCombatScientist :: DeathSound ( void )
 {
 	switch ( RANDOM_LONG(0,2) )
 	{
@@ -1793,7 +1809,7 @@ Schedule_t	slGruntRepelLand[] =
 };
 
 
-DEFINE_CUSTOM_SCHEDULES( CHGrunt )
+DEFINE_CUSTOM_SCHEDULES( CCombatScientist )
 {
 	slGruntFail,
 	slGruntCombatFail,
@@ -1818,12 +1834,12 @@ DEFINE_CUSTOM_SCHEDULES( CHGrunt )
 	slGruntRepelLand,
 };
 
-IMPLEMENT_CUSTOM_SCHEDULES( CHGrunt, CSquadMonster );
+IMPLEMENT_CUSTOM_SCHEDULES( CCombatScientist, CSquadMonster );
 
 //=========================================================
 // SetActivity 
 //=========================================================
-void CHGrunt :: SetActivity ( Activity NewActivity )
+void CCombatScientist :: SetActivity ( Activity NewActivity )
 {
 	int	iSequence = ACTIVITY_NOT_AVAILABLE;
 	void *pmodel = GET_MODEL_PTR( ENT(pev) );
@@ -1932,7 +1948,7 @@ void CHGrunt :: SetActivity ( Activity NewActivity )
 //=========================================================
 // Get Schedule!
 //=========================================================
-Schedule_t *CHGrunt :: GetSchedule( void )
+Schedule_t *CCombatScientist :: GetSchedule( void )
 {
 
 	// clear old sentence
@@ -2180,7 +2196,7 @@ Schedule_t *CHGrunt :: GetSchedule( void )
 
 //=========================================================
 //=========================================================
-Schedule_t* CHGrunt :: GetScheduleOfType ( int Type ) 
+Schedule_t* CCombatScientist :: GetScheduleOfType ( int Type ) 
 {
 	switch	( Type )
 	{
@@ -2333,11 +2349,11 @@ Schedule_t* CHGrunt :: GetScheduleOfType ( int Type )
 
 
 //=========================================================
-// CHGruntRepel - when triggered, spawns a monster_human_grunt
+// CCombatScientistRepel - when triggered, spawns a monster_human_grunt
 // repelling down a line.
 //=========================================================
 
-class CHGruntRepel : public CBaseMonster
+class CCombatScientistRepel : public CBaseMonster
 {
 public:
 	void Spawn( void );
@@ -2346,23 +2362,23 @@ public:
 	int m_iSpriteTexture;	// Don't save, precache
 };
 
-LINK_ENTITY_TO_CLASS( monster_grunt_repel, CHGruntRepel );
+LINK_ENTITY_TO_CLASS( monster_grunt_repel, CCombatScientistRepel );
 
-void CHGruntRepel::Spawn( void )
+void CCombatScientistRepel::Spawn( void )
 {
 	Precache( );
 	pev->solid = SOLID_NOT;
 
-	SetUse( &CHGruntRepel::RepelUse );
+	SetUse( &CCombatScientistRepel::RepelUse );
 }
 
-void CHGruntRepel::Precache( void )
+void CCombatScientistRepel::Precache( void )
 {
 	UTIL_PrecacheOther( "monster_human_grunt" );
 	m_iSpriteTexture = PRECACHE_MODEL( "sprites/rope.spr" );
 }
 
-void CHGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CCombatScientistRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	TraceResult tr;
 	UTIL_TraceLine( pev->origin, pev->origin + Vector( 0, 0, -4096.0), dont_ignore_monsters, ENT(pev), &tr);
