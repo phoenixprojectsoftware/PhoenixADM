@@ -44,7 +44,7 @@
 #include	"Env/CBeam.h"
 #include "AI/Monsters/MilitaryWeapons.h"
 
-int g_fCombatScientistQuestion;				// true if an idle grunt asked a question. Cleared when someone answers.
+int g_fGruntQuestion;				// true if an idle grunt asked a question. Cleared when someone answers.
 
 extern DLL_GLOBAL int		g_iSkillLevel;
 /*
@@ -194,6 +194,17 @@ const char *CCombatScientist::pGruntSentences[] =
 	"HG_TAUNT", // say rude things
 };
 
+enum
+{
+	HGRUNT_SENT_NONE = -1,
+	HGRUNT_SENT_GREN = 0,
+	HGRUNT_SENT_ALERT,
+	HGRUNT_SENT_MONSTER,
+	HGRUNT_SENT_COVER,
+	HGRUNT_SENT_THROW,
+	HGRUNT_SENT_CHARGE,
+	HGRUNT_SENT_TAUNT,
+} HGRUNT_SENTENCE_TYPES;
 
 //=========================================================
 // Speak Sentence - say your cued up sentence.
@@ -650,20 +661,20 @@ void CCombatScientist :: SetYawSpeed ( void )
 
 void CCombatScientist :: IdleSound( void )
 {
-	if (FOkToSpeak() && (g_fCombatScientistQuestion || RANDOM_LONG(0,1)))
+	if (FOkToSpeak() && (g_fGruntQuestion || RANDOM_LONG(0,1)))
 	{
-		if (!g_fCombatScientistQuestion)
+		if (!g_fGruntQuestion)
 		{
 			// ask question or make statement
 			switch (RANDOM_LONG(0,2))
 			{
 			case 0: // check in
 				SENTENCEG_PlayRndSz(ENT(pev), "HG_CHECK", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
-				g_fCombatScientistQuestion = 1;
+				g_fGruntQuestion = 1;
 				break;
 			case 1: // question
 				SENTENCEG_PlayRndSz(ENT(pev), "HG_QUEST", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
-				g_fCombatScientistQuestion = 2;
+				g_fGruntQuestion = 2;
 				break;
 			case 2: // statement
 				SENTENCEG_PlayRndSz(ENT(pev), "HG_IDLE", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
@@ -672,7 +683,7 @@ void CCombatScientist :: IdleSound( void )
 		}
 		else
 		{
-			switch (g_fCombatScientistQuestion)
+			switch (g_fGruntQuestion)
 			{
 			case 1: // check in
 				SENTENCEG_PlayRndSz(ENT(pev), "HG_CLEAR", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
@@ -681,7 +692,7 @@ void CCombatScientist :: IdleSound( void )
 				SENTENCEG_PlayRndSz(ENT(pev), "HG_ANSWER", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
 				break;
 			}
-			g_fCombatScientistQuestion = 0;
+			g_fGruntQuestion = 0;
 		}
 		JustSpoke();
 	}
@@ -2338,7 +2349,7 @@ Schedule_t* CCombatScientist :: GetScheduleOfType ( int Type )
 
 
 //=========================================================
-// CCombatScientistRepel - when triggered, spawns a monster_scientist_combat
+// CCombatScientistRepel - when triggered, spawns a monster_human_grunt
 // repelling down a line.
 //=========================================================
 
@@ -2351,7 +2362,7 @@ public:
 	int m_iSpriteTexture;	// Don't save, precache
 };
 
-LINK_ENTITY_TO_CLASS( monster_cscientist_repel, CCombatScientistRepel );
+LINK_ENTITY_TO_CLASS( monster_grunt_repel, CCombatScientistRepel );
 
 void CCombatScientistRepel::Spawn( void )
 {
@@ -2363,7 +2374,7 @@ void CCombatScientistRepel::Spawn( void )
 
 void CCombatScientistRepel::Precache( void )
 {
-	UTIL_PrecacheOther( "monster_scientist_combat" );
+	UTIL_PrecacheOther( "monster_human_grunt" );
 	m_iSpriteTexture = PRECACHE_MODEL( "sprites/rope.spr" );
 }
 
@@ -2376,7 +2387,7 @@ void CCombatScientistRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCa
 		return NULL;
 	*/
 
-	CBaseEntity *pEntity = Create( "monster_scientist_combat", pev->origin, pev->angles );
+	CBaseEntity *pEntity = Create( "monster_human_grunt", pev->origin, pev->angles );
 	CBaseMonster *pGrunt = pEntity->MyMonsterPointer( );
 	pGrunt->pev->movetype = MOVETYPE_FLY;
 	pGrunt->pev->velocity = Vector( 0, 0, RANDOM_FLOAT( -196, -128 ) );
@@ -2396,7 +2407,7 @@ void CCombatScientistRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCa
 
 
 
-/* //=========================================================
+//=========================================================
 // DEAD HGRUNT PROP
 //=========================================================
 class CDeadHGrunt : public CBaseMonster
@@ -2424,7 +2435,7 @@ void CDeadHGrunt::KeyValue( KeyValueData *pkvd )
 		CBaseMonster::KeyValue( pkvd );
 }
 
- LINK_ENTITY_TO_CLASS( monster_hgrunt_dead, CDeadHGrunt ); - we don't need this as it is in HGrunt.cpp
+LINK_ENTITY_TO_CLASS( monster_hgrunt_dead, CDeadHGrunt );
 
 //=========================================================
 // ********** DeadHGrunt SPAWN **********
@@ -2479,4 +2490,4 @@ void CDeadHGrunt :: Spawn( void )
 	}
 
 	MonsterInitDead();
-}*/
+}
