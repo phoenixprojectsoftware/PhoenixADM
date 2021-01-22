@@ -146,7 +146,6 @@ call ..\..\filecopy.bat "$(TargetDir)$(TargetName).pdb" "$(ModDir)\dlls\$(Target
     <ClCompile Include="..\..\dlls\AI\Monsters\BigMomma.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\Bloater.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\Bullsquid.cpp" />
-    <ClCompile Include="..\..\dlls\AI\Monsters\CombatScientist.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\Controller.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\FlockingFlyer.cpp" />
     <ClCompile Include="..\..\dlls\AI\Monsters\Gargantua.cpp" />
@@ -357,7 +356,6 @@ call ..\..\filecopy.bat "$(TargetDir)$(TargetName).pdb" "$(ModDir)\dlls\$(Target
     <ClInclude Include="..\..\dlls\AI\Activity.h" />
     <ClInclude Include="..\..\dlls\AI\ActivityMap.h" />
     <ClInclude Include="..\..\dlls\ADM\AdmVehicle.h" />
-    <ClInclude Include="..\..\dlls\AI\Monsters\MilitaryWeapons.h" />
     <ClInclude Include="..\..\dlls\Audio\CAmbientGeneric.h" />
     <ClInclude Include="..\..\dlls\Audio\CSpeaker.h" />
     <ClInclude Include="..\..\dlls\Base\Animation.h" />
