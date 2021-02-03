@@ -1,4 +1,4 @@
-#define clientBuild "2102"
+#define clientBuild "2102-rev2"
 #define Date __DATE__
 #define admVersion "2102"
 #define admAuthor "Admer456"
