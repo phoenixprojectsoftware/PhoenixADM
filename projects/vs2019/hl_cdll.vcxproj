@@ -160,6 +160,7 @@ call ..\..\filecopy.bat "$(TargetDir)$(TargetName).pdb" "$(ModDir)\cl_dlls\$(Tar
     <ClCompile Include="..\..\cl_dll\HUD\TextMessage.cpp" />
     <ClCompile Include="..\..\cl_dll\HUD\Train.cpp" />
     <ClCompile Include="..\..\cl_dll\HUD\VoiceStatus.cpp" />
+    <ClCompile Include="..\..\cl_dll\HUD\Watermark.cpp" />
     <ClCompile Include="..\..\cl_dll\Input\Input.cpp" />
     <ClCompile Include="..\..\cl_dll\Input\InputW32.cpp" />
     <ClCompile Include="..\..\cl_dll\Input\IN_Camera.cpp" />
@@ -258,6 +259,7 @@ call ..\..\filecopy.bat "$(TargetDir)$(TargetName).pdb" "$(ModDir)\cl_dlls\$(Tar
     <ClInclude Include="..\..\cl_dll\HUD\HUD_Spectator.h" />
     <ClInclude Include="..\..\cl_dll\HUD\Overview.h" />
     <ClInclude Include="..\..\cl_dll\HUD\VoiceStatus.h" />
+    <ClInclude Include="..\..\cl_dll\HUD\Watermark.h" />
     <ClInclude Include="..\..\cl_dll\Input\Camera.h" />
     <ClInclude Include="..\..\cl_dll\Input\IN_Defs.h" />
     <ClInclude Include="..\..\cl_dll\Input\KButton.h" />

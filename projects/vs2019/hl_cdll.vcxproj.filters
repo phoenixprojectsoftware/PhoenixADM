@@ -418,6 +418,9 @@
     <ClCompile Include="..\..\cl_dll\ADM\Components\SimpleSky.cpp">
       <Filter>Sources\ADM\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cl_dll\HUD\Watermark.cpp">
+      <Filter>Sources\HUD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\pm_shared\pm_debug.h">
@@ -770,6 +773,9 @@
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\ADM\AdmVersionInfo.h">
       <Filter>Sources\ADM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\HUD\Watermark.h">
+      <Filter>Sources\HUD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
