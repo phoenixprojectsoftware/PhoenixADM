@@ -21,6 +21,10 @@
 #include "adm/AdmVehicle.h"
 //#include "adm/adm_invehicle.h"
 
+cvar_t* sv_recharge;
+cvar_t* sv_recharge_rate;
+cvar_t* sv_recharge_wait;
+
 
 #define PLAYER_FATAL_FALL_SPEED		1024// approx 60 feet
 #define PLAYER_MAX_SAFE_FALL_SPEED	580// approx 20 feet

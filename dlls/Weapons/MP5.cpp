@@ -135,7 +135,7 @@ void CMP5::PrimaryAttack()
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.15;
+		m_flNextPrimaryAttack = 1.0;
 		return;
 	}
 
