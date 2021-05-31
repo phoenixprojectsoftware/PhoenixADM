@@ -79,7 +79,10 @@ cvar_t	teamlist = {"mp_teamlist","hgrunt;scientist", FCVAR_SERVER };
 cvar_t	teamoverride = {"mp_teamoverride","1" };
 cvar_t	defaultteam = {"mp_defaultteam","0" };
 cvar_t	allowmonsters={"mp_allowmonsters","1", FCVAR_SERVER };	// AdmSrc - changed to 1, 0 by default
-cvar_t mp5_old_rate = { "sv_mp5_old_rate", "1", FCVAR_SERVER };
+cvar_t	mp5_old_rate = { "sv_mp5_old_rate", "1", FCVAR_SERVER };
+cvar_t	regeneration = { "sv_regeneration", "1", FCVAR_SERVER }; // Controls if suit power regen should be on or not.
+cvar_t	regeneration_wait = { "sv_regeneration_wait", "1", FCVAR_SERVER }; // How long to wait after being damaged to recharge the suit power.
+cvar_t	regeneration_rate = { "sv_regeneration_rate", "0.5", FCVAR_SERVER }; // How fast the suit recharges.
 
 cvar_t  allow_spectators = { "allow_spectators", "0.0", FCVAR_SERVER };		// 0 prevents players from being spectators
 

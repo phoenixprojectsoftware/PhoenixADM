@@ -21,9 +21,7 @@
 #include "adm/AdmVehicle.h"
 //#include "adm/adm_invehicle.h"
 
-cvar_t* sv_recharge;
-cvar_t* sv_recharge_rate;
-cvar_t* sv_recharge_wait;
+
 
 
 #define PLAYER_FATAL_FALL_SPEED		1024// approx 60 feet
@@ -317,6 +315,7 @@ public:
 	void TabulateAmmo( void );
 
 	float m_flStartCharge;
+	float m_flTimeLastHurt;
 	float m_flAmmoStartCharge;
 	float m_flPlayAftershock;
 	float m_flNextAmmoBurn;// while charging, when to absorb another unit of player's ammo?
