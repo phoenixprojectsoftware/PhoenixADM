@@ -1,13 +1,8 @@
 #include "Base/ExtDLL.h"
 #include "Util.h"
 #include "Base/CBase.h"
-#include "Player.h"
 
 #include "../shared/ADM/AdmSound.h"
-#include "ADM/Audio/AudioShared.h"
-#include "Audio/CAmbientGeneric.h"
-#include "../../cl_dll/ADM/Sound/BaseSound.h"
-#include "../../cl_dll/ADM/Sound/SoundSource.h"
 
 extern int gmsgFSSMusic;
 SoundTable g_ServerSoundTable;
@@ -45,12 +40,12 @@ void CAudioMusic::KeyValue( KeyValueData *pkvd )
 void CAudioMusic::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	MESSAGE_BEGIN( MSG_ALL, gmsgFSSMusic );
-		WRITE_STRING( STRING( Sound_Play ) );
+		WRITE_STRING( STRING( m_iszSong ) );
 	MESSAGE_END();
 }
 
-
-	message(AdmSound::SoundSource::sound); : "WAV Name"
+/*
+	message(sound) : "WAV Name"
 	health(integer) : "Volume (10 = loudest)" : 10
 	preset(choices) :"Dynamic Presets" : 0 =
 	[
@@ -104,3 +99,4 @@ void CAudioMusic::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		16 : "Start Silent":0
 		32 : "Not Toggled":0
 	]
+*/

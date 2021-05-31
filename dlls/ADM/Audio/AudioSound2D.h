@@ -17,6 +17,6 @@ public:
 
 private:
 	string_t		soundName;
-	float				volume;
+	float			volume;
 	int				channelNumber;
 };
