@@ -798,6 +798,7 @@ Weapon Inertia
 */
 void V_CalcViewModelLag(ref_params_t* pparams, Vector& origin, Vector& angles, Vector original_angles)
 {
+
 	const float m_flWeaponLag = 2.0f;
 	const float m_flScale = 2.0f;
 
@@ -870,6 +871,7 @@ V_CalcRefdef
 void V_CalcRefdef_HL(struct ref_params_s* pparams)
 {
 	cl_entity_t* ent, * ViewModel;
+	// cl_entity_t* view;
 	int				i;
 	vec3_t			angles;
 	float			bob, waterOffset;
@@ -1019,7 +1021,7 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 
 	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
 	
-	if (cl_viewmodel_lag_enabled->value == 1) V_CalcViewModelLag(pparams, view->origin, view->angles, Vector(pparams->cl_viewangles));
+	if (cl_viewmodel_lag_enabled->value == 1) V_CalcViewModelLag(pparams, ViewModel->origin, ViewModel->angles, Vector(pparams->cl_viewangles));
 
 	V_CalculatePunchCLView(pparams);
 
@@ -2467,6 +2469,8 @@ void V_Init(void)
 	cl_bobup = gEngfuncs.pfnRegisterVariable("cl_bobup", "0.5", 0);
 	cl_waterdist = gEngfuncs.pfnRegisterVariable("cl_waterdist", "4", 0);
 	cl_chasedist = gEngfuncs.pfnRegisterVariable("cl_chasedist", "112", 0);
+
+	cl_viewmodel_lag_enabled = gEngfuncs.pfnRegisterVariable("cl_viewmodel_lag_enabled", "1", FCVAR_ARCHIVE); // comment this out for free nullptr error xddddddd
 }
 
 
