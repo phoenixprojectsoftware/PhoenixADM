@@ -98,6 +98,8 @@ cvar_t* cl_bobup;
 cvar_t* cl_waterdist;
 cvar_t* cl_chasedist;
 
+cvar_t* cl_viewmodel_lag_enabled;
+
 // These cvars are not registered (so users can't cheat), so set the ->value field directly
 // Register these cvars in V_Init() if needed for easy tweaking
 cvar_t	v_iyaw_cycle = { "v_iyaw_cycle", "2", 0, 2 };
@@ -1017,7 +1019,7 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 
 	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
 	
-	V_CalcViewModelLag(pparams, view->origin, view->angles, Vector(pparams->cl_viewangles));
+	if (cl_viewmodel_lag_enabled->value == 1) V_CalcViewModelLag(pparams, view->origin, view->angles, Vector(pparams->cl_viewangles));
 
 	V_CalculatePunchCLView(pparams);
 
