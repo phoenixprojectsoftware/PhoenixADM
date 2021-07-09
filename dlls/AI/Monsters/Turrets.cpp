@@ -287,6 +287,9 @@ void CBaseTurret::Precache( )
 	PRECACHE_SOUND ("turret/tu_spindown.wav");
 	PRECACHE_SOUND ("turret/tu_search.wav");
 	PRECACHE_SOUND ("turret/tu_alert.wav");
+	PRECACHE_SOUND("weapons/saw_fire1.wav");
+	PRECACHE_SOUND("weapons/saw_fire2.wav");
+	PRECACHE_SOUND("weapons/saw_fire3.wav");
 }
 
 #define TURRET_GLOW_SPRITE "sprites/flare3.spr"
