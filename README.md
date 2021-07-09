@@ -1,12 +1,14 @@
-Advanced Development Mod
-======================
+# PhoenixADM
 
-ADM is a Half-Life mod base that aims to bring quality-of-life features while maintaining compatibility with the Half-Life singleplayer campaign. It is what powers the mod Utopia at Stake. ([ModDB page](https://www.moddb.com/mods/admerthegame)) 
+PhoenixADM is a Half-Life mod base that aims to bring quality-of-life features while maintaining compatibility with the Half-Life singleplayer campaign, originally developed by @Admer456. It is what powers the mods *Utopia at Stake* and *Half-Life: Zombies Ate My Neighbours.*
 You can track exact progress, suggest features, ask questions about features etc. on the [Trello board](https://trello.com/b/mbpXU4ff).
 
 Current target version: 0.1.0  
 Current released version: 0.1.0A1  
 Check out what this means [on the wiki](https://github.com/Admer456/halflife-ADM/wiki)!  
+
+## Notice
+**The default 'configuration' for this is for *Half-Life: Zombies Ate My Neighbours* - so if you want to make a mod from this, you will need to edit the HUD colour, weapon carries, fire rates etc!!**
 
 ## **Features:**
 
@@ -27,7 +29,7 @@ Check out what this means [on the wiki](https://github.com/Admer456/halflife-ADM
 
 ## **Downloads:**
 
-Check out [Releases](https://github.com/Admer456/halflife-ADM/releases).   
+Check out [Releases](https://github.com/phoenixprojectsoftware/phoenixADM/releases).   
 
 Half Life 1 SDK LICENSE
 ======================

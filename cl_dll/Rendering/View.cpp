@@ -98,6 +98,8 @@ cvar_t* cl_bobup;
 cvar_t* cl_waterdist;
 cvar_t* cl_chasedist;
 
+cvar_t* cl_viewmodel_lag_enabled;
+
 // These cvars are not registered (so users can't cheat), so set the ->value field directly
 // Register these cvars in V_Init() if needed for easy tweaking
 cvar_t	v_iyaw_cycle = { "v_iyaw_cycle", "2", 0, 2 };
@@ -789,6 +791,77 @@ void V_CalculatePunchCLView(ref_params_t* pparams)
 }
 
 /*
+==============
+V_CalcViewModelLag
+Weapon Inertia
+==============
+*/
+void V_CalcViewModelLag(ref_params_t* pparams, Vector& origin, Vector& angles, Vector original_angles)
+{
+	const float m_flWeaponLag = 2.0f;
+	const float m_flScale = 2.0f;
+
+	static Vector m_vecLastFacing;
+	Vector vOriginalOrigin = origin;
+	Vector vOriginalAngles = pparams->cl_viewangles;
+
+	// Calculate our drift
+	Vector    forward, right, up;
+	AngleVectors(vOriginalAngles, forward, right, up);
+
+	if (pparams->frametime != 0.0f)    // not in paused
+	{
+		Vector vDifference;
+
+		vDifference = forward - m_vecLastFacing;
+
+		float flSpeed = 5.0f;
+
+		// If we start to lag too far behind, we'll increase the "catch up" speed.
+		// Solves the problem with fast cl_yawspeed, m_yaw or joysticks rotating quickly.
+		// The old code would slam lastfacing with origin causing the viewmodel to pop to a new position
+		float flDiff = vDifference.Length();
+		if ((flDiff > m_flWeaponLag) && (m_flWeaponLag > 0.0f))
+		{
+			float flScale = flDiff / m_flWeaponLag;
+			flSpeed *= flScale;
+		}
+		// FIXME:  Needs to be predictable?
+		m_vecLastFacing = m_vecLastFacing + vDifference * (flSpeed * pparams->frametime);
+		// Make sure it doesn't grow out of control!!!
+		m_vecLastFacing = m_vecLastFacing.Normalize();
+
+		origin = origin + (vDifference * -1.0f) * m_flScale;
+	}
+
+	AngleVectors(original_angles, forward, right, up);
+
+	float pitch = original_angles[PITCH];
+
+	if (pitch > 180.0f)
+	{
+		pitch -= 360.0f;
+	}
+	else if (pitch < -180.0f)
+	{
+		pitch += 360.0f;
+	}
+
+	if (m_flWeaponLag <= 0.0f)
+	{
+		origin = vOriginalOrigin;
+		angles = vOriginalAngles;
+	}
+	else
+	{
+		// FIXME: These are the old settings that caused too many exposed polys on some models
+		origin = origin + forward * (-pitch * 0.035f);
+		origin = origin + right * (-pitch * 0.03f);
+		origin = origin + up * (-pitch * 0.02f);
+	}
+}
+
+/*
 ==================
 V_CalcRefdef
 
@@ -945,6 +1018,8 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 	VectorAdd(pparams->viewangles, (float*)&ev_punchangle, pparams->viewangles);
 
 	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
+	
+	if (cl_viewmodel_lag_enabled->value == 1) V_CalcViewModelLag(pparams, view->origin, view->angles, Vector(pparams->cl_viewangles));
 
 	V_CalculatePunchCLView(pparams);
 
