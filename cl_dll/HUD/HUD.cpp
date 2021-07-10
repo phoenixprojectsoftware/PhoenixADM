@@ -306,7 +306,7 @@ void PrintVersion()
 	gEngfuncs.Con_Printf("\n  ADM Originally created by: %s", admAuthor);
 	gEngfuncs.Con_Printf("\n  Phoenix ADM created by: %s", admModifier);
 	gEngfuncs.Con_Printf("\n  SDK: %s", admRepo);
-	gEngfuncs.Con_Printf("\n||------------------------------------------||");
+	gEngfuncs.Con_Printf("\n||------------------------------------------||\n");
 }
 
 void PrintWatermark()

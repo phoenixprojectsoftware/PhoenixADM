@@ -53,7 +53,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\dlls\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\int\</IntDir>
-    <TargetName>hl</TargetName>
+    <TargetName>adm</TargetName>
     <IncludePath>..\..\dlls\bullet;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\dlls\bullet;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
