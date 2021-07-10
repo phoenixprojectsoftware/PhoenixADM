@@ -50,6 +50,7 @@ extern float	vJumpOrigin[3];
 extern float	vJumpAngles[3];
 
 
+void NewPunch(float* ev_punchangle, float framtime);
 void V_DropPunchAngle(float frametime, float* ev_punchangle);
 void VectorAngles(const float* forward, float* angles);
 
@@ -782,14 +783,6 @@ void V_CalcWaterOffset(ref_params_t* pparams, float& waterOffset)
 	pparams->vieworg[2] += waterOffset;
 }
 
-void V_CalculatePunchCLView(ref_params_t* pparams)
-{
-	Vector totalPunch = gHUD.m_clPunch.GetTotalPunch();
-
-	for (int i = 0; i < 3; i++)
-		pparams->cl_viewangles[i] += totalPunch[i] * pparams->frametime;
-}
-
 /*
 ==============
 V_CalcViewModelLag
@@ -1020,10 +1013,10 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 	VectorAdd(pparams->viewangles, (float*)&ev_punchangle, pparams->viewangles);
 
 	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
+
+	void NewPunch(float* ev_punchangle, float frametime);
 	
 	if (cl_viewmodel_lag_enabled->value == 1) V_CalcViewModelLag(pparams, ViewModel->origin, ViewModel->angles, Vector(pparams->cl_viewangles));
-
-	V_CalculatePunchCLView(pparams);
 
 	V_CalcViewSmoothing(pparams, oldz, lasttime, ViewModel, ViewInterp);
 
@@ -1566,6 +1559,7 @@ void V_CalcRefdef_ADM(struct ref_params_s* pparams)
 	VectorAdd(pparams->viewangles, (float*)&ev_punchangle, pparams->viewangles);
 
 	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
+	NewPunch((float*)&ev_punchangle, pparams->frametime);
 
 	V_CalcViewSmoothing(pparams, oldz, lasttime, ViewModel, ViewInterp);
 
@@ -2413,10 +2407,10 @@ void V_DropPunchAngle(float frametime, float* ev_punchangle)
 	VectorScale(ev_punchangle, len, ev_punchangle);
 }
 
-void V_PunchCLView(Vector angles, float speed)
+/*void V_PunchCLView(Vector angles, float speed)
 {
 	gHUD.m_clPunch.AddPunch(angles, speed);
-}
+}*/
 
 /*
 =============
@@ -2436,7 +2430,7 @@ void V_PunchAxis(int axis, float punch)
 	Vector angle(0, 0, 0);
 	angle[axis] = punch * 4.0;
 
-	V_PunchCLView(angle, 25.0f);
+	//V_PunchCLView(angle, 25.0f);
 
 #endif
 }
@@ -2446,6 +2440,56 @@ void V_PunchAxis(float pitch, float yaw, float roll)
 	ev_punchangle[PITCH] = pitch;
 	ev_punchangle[YAW] = yaw;
 	ev_punchangle[ROLL] = roll;
+}
+
+/*
+=============
+NewPunch
+Client punch behaviour from HL2/Source 2013
+=============
+*/
+#define PUNCH_DAMPING			9.0f // bigger number makes the response more damped, smaller is less damped
+// currently the system will overshoot, with larger damping values it won't
+#define PUNCH_SPRING_CONSTANT 65.0f // bigger number increases the speed at which the view corrects
+#define clamp( val, min, max ) ( ((val) > (max)) ? (max) : ( ((val) < (min)) ? (min) : (val) ) )
+
+vec3_t punch;
+
+void NewPunch(float* ev_punchangle, float frametime)
+{
+	float damping;
+	float springForceMagnitude;
+
+	if (Length(ev_punchangle) > 0.001 || Length(punch) > 0.001)
+	{
+		VectorMA(ev_punchangle, frametime, punch, ev_punchangle);
+		damping = 1 - (PUNCH_DAMPING * frametime);
+
+		if (damping < 0)
+		{
+			damping = 0;
+		}
+		VectorScale(punch, damping, punch);
+
+		// torsional spring
+		// UNDONE: Per-axis spring constant?
+		springForceMagnitude = PUNCH_SPRING_CONSTANT * frametime;
+		springForceMagnitude = clamp(springForceMagnitude, 0, 2);
+
+		VectorMA(punch, -springForceMagnitude, ev_punchangle, punch);
+
+		// dont' wrap around
+		//ev_punchangle[0] = clamp(ev_punchangle[0], -7, 7);
+		//ev_punchangle[1] = clamp(ev_punchangle[1], -179, 179);
+		//ev_punchangle[2] = clamp(ev_punchangle[2], -7, 7);
+	}
+}
+
+void Punch(float p, float y, float r)
+{
+	punch[0] -= p * 20;
+	punch[1] += y * 20;
+	punch[2] += r * 20;
 }
 
 /*
