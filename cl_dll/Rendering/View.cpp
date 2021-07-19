@@ -2421,18 +2421,7 @@ Client side punch effect
 */
 void V_PunchAxis(int axis, float punch)
 {
-#if ADM_CustomClientPunch == 0
-
 	ev_punchangle[axis] = punch;
-
-#else 
-
-	Vector angle(0, 0, 0);
-	angle[axis] = punch * 4.0;
-
-	//V_PunchCLView(angle, 25.0f);
-
-#endif
 }
 
 void V_PunchAxis(float pitch, float yaw, float roll)
