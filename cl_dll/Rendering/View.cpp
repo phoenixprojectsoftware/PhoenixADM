@@ -1009,7 +1009,7 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 
 	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
 
-	void NewPunch(float* ev_punchangle, float frametime);
+	NewPunch((float*)&ev_punchangle, pparams->frametime);
 	
 	if (cl_viewmodel_lag_enabled->value == 1) V_CalcViewModelLag(pparams, ViewModel->origin, ViewModel->angles, Vector(pparams->cl_viewangles));
 
@@ -1607,7 +1607,7 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	v_velocity = pparams->simvel;
 
 	V_CalcRefdef_HL(pparams);
-	//V_CalcRefdef_ADM( pparams );
+	V_CalcRefdef_ADM( pparams );
 }
 
 // Get the origin of the Observer based around the target's position and angles
