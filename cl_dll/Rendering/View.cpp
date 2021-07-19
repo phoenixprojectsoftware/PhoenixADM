@@ -1058,7 +1058,7 @@ void V_CalcRefdef_ADM(struct ref_params_s* pparams)
 	vec3_t			angles;
 	float			v_positionbob, v_rollbob_y, v_rollbob_p, v_rollbob_r, v_positionbob_sway, waterOffset;
 	float			rollBobTimeDiv, rollBobFrequency, RBPitch, RBYaw, RBRoll, bobPos, bobPosSway, bobHeight;
-	//	float			developer, adm_classicbob, adm_cam_sway, adm_cam_roll, adm_cam_falleffect;
+	// float			developer, adm_classicbob, adm_cam_sway, adm_cam_roll, adm_cam_falleffect;
 
 		// double &bobtime, float &bob, float &lasttime
 	static double bobtimes[5] = { 0,0,0,0,0 };
@@ -1527,7 +1527,7 @@ void V_CalcRefdef_ADM(struct ref_params_s* pparams)
 	//ViewModel->origin[2] -= 1;
 
 	// HL2-style, viewmodel goes up when we look up or down, but stays still when we look straight
-	ViewModel->origin[2] += 1.0;
+	// ViewModel->origin[2] += 1.0;
 
 	for (int i = 0; i < 2; i++)
 		ViewModel->origin[i] += 2.0 * pparams->up[i] * (pparams->cl_viewangles[PITCH] / 90.0);
@@ -1679,7 +1679,7 @@ void V_GetChaseOrigin(float* angles, float* origin, float distance, float* retur
 	v_lastDistance = Distance(trace->endpos, origin);	// real distance without offset
 }
 
-/*void V_GetDeathCam(cl_entity_t * ent1, cl_entity_t * ent2, float * angle, float * origin)
+void V_GetDeathCam(cl_entity_t * ent1, cl_entity_t * ent2, float * angle, float * origin)
 {
 	float newAngle[3]; float newOrigin[3];
 
@@ -1719,7 +1719,7 @@ void V_GetChaseOrigin(float* angles, float* origin, float distance, float* retur
 	V_GetChaseOrigin( angle, newOrigin, distance, origin );
 
 	VectorCopy(angle, v_lastAngles);
-}*/
+}
 
 void V_GetSingleTargetCam(cl_entity_t* ent1, float* angle, float* origin)
 {
@@ -1894,8 +1894,7 @@ void V_GetDoubleTargetsCam(cl_entity_t* ent1, cl_entity_t* ent2, float* angle, f
 	VectorAngles(tempVec, tempVec);
 	tempVec[0] = -tempVec[0];
 
-	/* take middle between two viewangles
-	InterpolateAngles( newAngle, tempVec, newAngle, 0.5f); */
+	InterpolateAngles( newAngle, tempVec, newAngle, 0.5f);
 
 
 
