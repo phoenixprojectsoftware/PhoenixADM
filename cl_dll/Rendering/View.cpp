@@ -24,11 +24,6 @@
 #include "SDL2/SDL.h"
 #include "ADM/System/SDLWrapper.h"
 
-// Since ADM should not affect HL gameplay,
-// I've decided to disable this feature as it makes a significant change in aiming,
-// as well as bringing back the old view bobbing.
-#define ADM_CustomClientPunch 0
-
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
