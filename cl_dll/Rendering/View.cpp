@@ -24,6 +24,11 @@
 #include "SDL2/SDL.h"
 #include "ADM/System/SDLWrapper.h"
 
+// Since ADM should not affect HL gameplay,
+// I've decided to disable this feature as it makes a significant change in aiming,
+// as well as bringing back the old view bobbing.
+#define ADM_CustomClientPunch 0
+
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
@@ -2402,10 +2407,10 @@ void V_DropPunchAngle(float frametime, float* ev_punchangle)
 	VectorScale(ev_punchangle, len, ev_punchangle);
 }
 
-/*void V_PunchCLView(Vector angles, float speed)
+void V_PunchCLView(Vector angles, float speed)
 {
 	gHUD.m_clPunch.AddPunch(angles, speed);
-}*/
+}
 
 /*
 =============
@@ -2416,7 +2421,16 @@ Client side punch effect
 */
 void V_PunchAxis(int axis, float punch)
 {
+#if ADM_CustomClientPunch == 0
 	ev_punchangle[axis] = punch;
+
+#else
+	Vector angle(0, 0, 0);
+	angle[axis] = punch * 4.0;
+
+	PunchCLView(angle, 25.0f);
+
+#endif
 }
 
 void V_PunchAxis(float pitch, float yaw, float roll)
