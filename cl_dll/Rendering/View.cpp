@@ -99,6 +99,12 @@ cvar_t* cl_bobup;
 cvar_t* cl_waterdist;
 cvar_t* cl_chasedist;
 
+cvar_t* cl_crowbar_punch_enabled;
+cvar_t* cl_gauss_random_punch_enabled;
+cvar_t* cl_hornet_random_punch_enabled;
+cvar_t* cl_mp5_new_punch_enabled;
+cvar_t* cl_mp5_punch_roll_enabled; // Let's add a little tilt to the MP5.
+
 cvar_t* cl_viewmodel_lag_enabled;
 
 // These cvars are not registered (so users can't cheat), so set the ->value field directly
@@ -2511,6 +2517,11 @@ void V_Init(void)
 	cl_waterdist = gEngfuncs.pfnRegisterVariable("cl_waterdist", "4", 0);
 	cl_chasedist = gEngfuncs.pfnRegisterVariable("cl_chasedist", "112", 0);
 
+	cl_crowbar_punch_enabled = gEngfuncs.pfnRegisterVariable("cl_crowbar_punch_enabled", "1", FCVAR_ARCHIVE);
+	cl_gauss_random_punch_enabled = gEngfuncs.pfnRegisterVariable("cl_gauss_random_punch_enabled", "1", FCVAR_ARCHIVE);
+	cl_hornet_random_punch_enabled = gEngfuncs.pfnRegisterVariable("cl_hornet_random_punch_enabled", "1", FCVAR_ARCHIVE);
+	cl_mp5_new_punch_enabled = gEngfuncs.pfnRegisterVariable("cl_mp5_new_punch_enabled", "1", FCVAR_ARCHIVE);
+	cl_mp5_punch_roll_enabled = gEngfuncs.pfnRegisterVariable("cl_mp5_punch_roll_enabled", "1", FCVAR_ARCHIVE);
 	cl_viewmodel_lag_enabled = gEngfuncs.pfnRegisterVariable("cl_viewmodel_lag_enabled", "1", FCVAR_ARCHIVE); // comment this out for free nullptr error xddddddd
 }
 

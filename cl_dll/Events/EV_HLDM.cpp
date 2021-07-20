@@ -49,6 +49,12 @@ void VectorAngles(const float* forward, float* angles);
 
 extern cvar_t* cl_lw;
 
+extern cvar_t* cl_crowbar_punch_enabled;
+extern cvar_t* cl_gauss_random_punch_enabled;
+extern cvar_t* cl_hornet_random_punch_enabled;
+extern cvar_t* cl_mp5_new_punch_enabled;
+extern cvar_t* cl_mp5_punch_roll_enabled;
+
 extern "C"
 {
 
@@ -695,29 +701,76 @@ void EV_FireMP5(event_args_t* args)
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(MP5_FIRE1 + gEngfuncs.pfnRandomLong(0, 2), 2);
 
-		switch (gEngfuncs.pfnRandomLong(0, 1))
+		if (cl_mp5_punch_roll_enabled->value == 0)
 		{
-		case 0:
-			Punch(0.5, 0.75, 0);
-			break;
-		case 1:
-			Punch(0.5, -0.75, 0);
-			break;
+			if (cl_mp5_new_punch_enabled->value == 1)
+			{
+				switch (gEngfuncs.pfnRandomLong(0, 3))
+				{
+				case 0:
+					Punch(0.5, 0.75, 0);
+					break;
+				case 1:
+					Punch(0.5, -0.75, 0);
+					break;
+				case 2:
+					Punch(-0.5, 0.75, 0);
+					break;
+				case 3:
+					Punch(-0.5, -0.75, 0);
+					break;
+				}
+			}
+			else
+			{
+				V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-1, 1));
+				V_PunchAxis(1, gEngfuncs.pfnRandomFloat(-1, 1));
+			}
 		}
-		// V_PunchAxis(2, gEngfuncs.pfnRandomFloat(-10, 10)); I did this for https://www.youtube.com/watch?v=MmivmiwH53E
-	}
-
+		else
+		{
+			if (cl_mp5_new_punch_enabled->value == 1)
+			{
+				switch (gEngfuncs.pfnRandomLong(0, 3))
+				{
+				case 0:
+					Punch(0.5, 0.75, 0.25);
+					break;
+				case 1:
+					Punch(0.5, -0.75, -0.25);
+					break;
+				case 2:
+					Punch(-0.5, 0.75, 0.25);
+					break;
+				case 3:
+					Punch(-0.5, -0.75, -0.25);
+					break;
+				}
+			}
+			else
+			{
+				V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-1, 1));
+				V_PunchAxis(1, gEngfuncs.pfnRandomFloat(-1, 1));
+				V_PunchAxis(2, gEngfuncs.pfnRandomFloat(-0.5, 0.5));
+			}
+		}
 	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
 
-	switch (gEngfuncs.pfnRandomLong(0, 1))
+	switch (gEngfuncs.pfnRandomLong(0, 3))
 	{
 	case 0:
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/hks1.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 		break;
 	case 1:
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/hks2.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	case 2:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/hks3.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	case 3:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/hks4.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 		break;
 	}
 
@@ -795,7 +848,21 @@ void EV_FirePython(event_args_t* args)
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(PYTHON_FIRE1, multiplayer ? 1 : 0);
 
-		Punch(10, 0, 0);
+		switch (gEngfuncs.pfnRandomLong(0, 3))
+		{
+		case 0:
+			Punch(0.5, 0.75, 0.25);
+			break;
+		case 1:
+			Punch(0.5, -0.75, -0.25);
+			break;
+		case 2:
+			Punch(-0.5, 0.75, 0.25);
+			break;
+		case 3:
+			Punch(-0.5, -0.75, -0.25);
+			break;
+		}
 	}
 
 	switch (gEngfuncs.pfnRandomLong(0, 1))
@@ -908,7 +975,23 @@ void EV_FireGauss(event_args_t* args)
 
 	if (EV_IsLocal(idx))
 	{
-		Punch(1, 0, 0);
+		if (cl_gauss_random_punch_enabled->value == 1)
+		{
+			switch ((gEngfuncs.pfnRandomLong(0, 1)))
+			{
+			case 0:
+				Punch(1, 0, 0);
+				break;
+			case 1:
+				Punch(-1, 0, 0);
+				break;
+			}
+		}
+		else
+		{
+			Punch(1, 0, 0);
+		}
+
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(GAUSS_FIRE2, 2);
 
 		if (m_fPrimaryFire == false)
@@ -1182,6 +1265,19 @@ void EV_Crowbar(event_args_t* args)
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK2MISS, 1); break;
 		case 2:
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK3MISS, 1); break;
+		}
+
+		if (cl_crowbar_punch_enabled->value == 1)
+		{
+			switch ((gEngfuncs.pfnRandomLong(0, 1)))
+			{
+			case 0:
+				Punch(5, 5, 0);
+				break;
+			case 1:
+				Punch(-5, -5, 0);
+				break;
+			}
 		}
 	}
 }
@@ -1548,7 +1644,23 @@ void EV_HornetGunFire(event_args_t* args)
 	//Only play the weapon anims if I shot it.
 	if (EV_IsLocal(idx))
 	{
-		Punch(2, 0, 0); // no need for this to be random
+		if (cl_hornet_random_punch_enabled->value == 1)
+		{
+			switch ((gEngfuncs.pfnRandomLong(0, 1)))
+			{
+			case 0:
+				Punch(2, 0, 0);
+				break;
+			case 1:
+				Punch(-2, 0, 0);
+				break;
+			}
+		}
+		else
+		{
+			Punch(2, 0, 0);
+		}
+
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(HGUN_SHOOT, 1);
 	}
 
