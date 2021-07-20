@@ -510,7 +510,6 @@ void PrintVersion()
 // This gets called one time when the game is initialied
 void GameDLLInit( void )
 {
-	PrintVersion();
 
 	// Register cvars here:
 

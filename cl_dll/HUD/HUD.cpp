@@ -380,6 +380,8 @@ void CHud::Init(void)
 	HOOK_COMMAND("special", InputPlayerSpecial);
 	HOOK_COMMAND("togglebrowser", ToggleServerBrowser);
 
+	PrintVersion();
+
 	// AdmSrc - sound system
 //	HOOK_COMMAND( "admsi_stop", ADMSIStop );
 
