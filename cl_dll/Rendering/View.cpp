@@ -1612,7 +1612,7 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	v_velocity = pparams->simvel;
 
 	V_CalcRefdef_HL(pparams);
-	V_CalcRefdef_ADM( pparams );
+	//V_CalcRefdef_ADM( pparams );
 }
 
 // Get the origin of the Observer based around the target's position and angles
