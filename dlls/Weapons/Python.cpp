@@ -91,7 +91,9 @@ void CPython::Precache(void)
 	PRECACHE_SOUND("weapons/357_reload1.wav");
 	PRECACHE_SOUND("weapons/357_cock1.wav");
 	PRECACHE_SOUND("weapons/hks4.wav");
-	// PRECACHE_SOUND("weapons/hks2.wav");
+	PRECACHE_SOUND("weapons/hks2.wav");
+	PRECACHE_SOUND("weapons/hks3.wav");
+	PRECACHE_SOUND("weapons/hks1.wav");
 
 	m_usFirePython = PRECACHE_EVENT(1, "events/python.sc");
 }
