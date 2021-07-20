@@ -1,6 +1,6 @@
-#define clientBuild "2106-rev1"
+#define clientBuild "2107-rev1"
 #define Date __DATE__
-#define admVersion "2106"
+#define admVersion "2107"
 #define admAuthor "Admer456"
 #define admModifier "The Phoenix Project Software"
-#define admRepo "https://github.com/phoenixprojectsoftware/phoenixADM"
+#define admRepo "https://github.com/phoenixprojectsoftware/PhoenixADM"
