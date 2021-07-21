@@ -107,6 +107,8 @@ cvar_t* cl_mp5_punch_roll_enabled; // Let's add a little tilt to the MP5.
 
 cvar_t* cl_viewmodel_lag_enabled;
 
+cvar_t* adm_bob_enabled;
+
 // These cvars are not registered (so users can't cheat), so set the ->value field directly
 // Register these cvars in V_Init() if needed for easy tweaking
 cvar_t	v_iyaw_cycle = { "v_iyaw_cycle", "2", 0, 2 };
@@ -1618,7 +1620,7 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	v_velocity = pparams->simvel;
 
 	V_CalcRefdef_HL(pparams);
-	//V_CalcRefdef_ADM( pparams );
+	if (adm_bob_enabled->value == 1) V_CalcRefdef_ADM( pparams );
 }
 
 // Get the origin of the Observer based around the target's position and angles
@@ -2523,6 +2525,7 @@ void V_Init(void)
 	cl_mp5_new_punch_enabled = gEngfuncs.pfnRegisterVariable("cl_mp5_new_punch_enabled", "1", FCVAR_ARCHIVE);
 	cl_mp5_punch_roll_enabled = gEngfuncs.pfnRegisterVariable("cl_mp5_punch_roll_enabled", "1", FCVAR_ARCHIVE);
 	cl_viewmodel_lag_enabled = gEngfuncs.pfnRegisterVariable("cl_viewmodel_lag_enabled", "1", FCVAR_ARCHIVE); // comment this out for free nullptr error xddddddd
+	adm_bob_enabled = gEngfuncs.pfnRegisterVariable("adm_bob_enabled", "0", FCVAR_ARCHIVE);
 }
 
 
