@@ -20,6 +20,7 @@
 #include "shake.h"
 #include "hltv.h"
 #include "Exports.h"
+#include "Platform.h"
 
 #include "SDL2/SDL.h"
 #include "ADM/System/SDLWrapper.h"
@@ -57,6 +58,7 @@ void VectorAngles(const float* forward, float* angles);
 #include "r_studioint.h"
 #include "com_model.h"
 #include "Input/KButton.h"
+#include "View.h"
 
 extern engine_studio_api_t IEngineStudio;
 
@@ -93,8 +95,7 @@ cvar_t* scr_ofsz;
 cvar_t* v_centermove;
 cvar_t* v_centerspeed;
 
-cvar_t* cl_bobcycle;
-cvar_t* cl_bob;
+cvar_t* cl_bobcycle_max;
 cvar_t* cl_bobup;
 cvar_t* cl_waterdist;
 cvar_t* cl_chasedist;
@@ -178,6 +179,25 @@ void V_InterpolateAngles( float *start, float *end, float *output, float frac )
 	V_NormalizeAngles( output );
 } */
 
+inline float RemapVal(float val, float A, float B, float C, float D)
+{
+	if (A == B)
+		return val >= B ? D : C;
+	return C + (D - C) * (val - A) / (B - A);
+}
+
+inline float clamp(float val, float minVal, float maxVal)
+{
+	if (maxVal < minVal)
+		return maxVal;
+	else if (val < minVal)
+		return minVal;
+	else if (val > maxVal)
+		return maxVal;
+	else
+		return val;
+}
+
 enum calcBobMode_t
 {
 	VB_COS,
@@ -186,53 +206,92 @@ enum calcBobMode_t
 	VB_SIN2
 };
 
-// Quakeworld bob code, this fixes jitters in the mutliplayer since the clock (pparams->time) isn't quite linear
-void V_CalcBob(struct ref_params_s* pparams, float freqmod, calcBobMode_t mode, double& bobtime, float& bob, float& lasttime)
+//
+// Based on HL2 bob code
+// https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/shared/hl2/basehlcombatweapon_shared.cpp#L256
+
+struct BobValues
 {
-	float	cycle;
-	vec3_t	vel;
+	float verticalBob = 0;
+	float laterialBob = 0;
+};
 
-	if (pparams->onground == -1 ||
-		pparams->time == lasttime)
+BobValues V_CalculateBob(vec3_t velocity, float currentTime)
+{
+	BobValues bob;
+
+	static float bobtime;
+	static float lastbobtime;
+	float cycle;
+
+	float speed = Length(velocity);
+
+	speed = clamp(speed, -320.f, 320.f);
+
+	float bob_offset = RemapVal(speed, 0, 320, 0.0f, 1.0f);
+
+	bobtime += (currentTime - lastbobtime) * bob_offset;
+	lastbobtime = currentTime;
+
+	auto bobmax = cl_bobcycle_max->value;
+	auto bobup = cl_bobup->value;
+
+	//Calculate the vertical bob
+	cycle = bobtime - (int)(bobtime / bobmax) * bobmax;
+	cycle /= bobmax;
+
+	if (cycle < bobup)
 	{
-		// just use old value
-		return;// bob;	
-	}
-
-	lasttime = pparams->time;
-
-	bobtime += pparams->frametime * freqmod;
-	cycle = bobtime - (int)(bobtime / cl_bobcycle->value) * cl_bobcycle->value;
-	cycle /= cl_bobcycle->value;
-
-	if (cycle < cl_bobup->value)
-	{
-		cycle = M_PI * cycle / cl_bobup->value;
+		cycle = M_PI * cycle / bobup;
 	}
 	else
 	{
-		cycle = M_PI + M_PI * (cycle - cl_bobup->value) / (1.0 - cl_bobup->value);
+		cycle = M_PI + M_PI * (cycle - bobup) / (1.0f - bobup);
 	}
 
-	// bob is proportional to simulated velocity in the xy plane
-	// (don't count Z, or jumping messes it up)
-	VectorCopy(pparams->simvel, vel);
-	vel[2] = 0;
+	bob.verticalBob = speed * 0.005f;
+	bob.verticalBob = bob.verticalBob * 0.3 + bob.verticalBob * 0.7 * sin(cycle);
 
-	bob = sqrt(vel[0] * vel[0] + vel[1] * vel[1]) * cl_bob->value;
+	bob.verticalBob = clamp(bob.verticalBob, -7.0f, 4.0f);
 
-	if (mode == VB_SIN)
-		bob = bob * 0.3 + bob * 0.7 * sin(cycle);
-	else if (mode == VB_COS)
-		bob = bob * 0.3 + bob * 0.7 * cos(cycle);
-	else if (mode == VB_SIN2)
-		bob = bob * 0.3 + bob * 0.7 * sin(cycle) * sin(cycle);
-	else if (mode == VB_COS2)
-		bob = bob * 0.3 + bob * 0.7 * cos(cycle) * cos(cycle);
+	//Calculate the lateral bob
+	cycle = bobtime - (int)(bobtime / bobmax * 2) * bobmax * 2;
+	cycle /= bobmax * 2;
 
-	bob = V_min(bob, 4);
-	bob = V_max(bob, -7);
-	//return bob;
+	if (cycle < bobup)
+	{
+		cycle = M_PI * cycle / bobup;
+	}
+	else
+	{
+		cycle = M_PI + M_PI * (cycle - bobup) / (1.0f - bobup);
+	}
+
+	bob.laterialBob = speed * 0.005f;
+	bob.laterialBob = bob.laterialBob * 0.3 + bob.laterialBob * 0.7 * sin(cycle);
+	bob.laterialBob = clamp(bob.laterialBob, -7.0f, 4.0f);
+}
+
+void V_ApplyBob(struct ref_params_s* pparams, cl_entity_t* view)
+{
+	if (!pparams->time)
+		return;
+
+	auto bob = V_CalculateBob(pparams->simvel, pparams->time);
+
+	// Apply bob, but scaled down to 40%
+	VectorMA(view->origin, bob.verticalBob * 0.1f, pparams->forward, view->origin);
+
+	// Z bob a bit more
+	view->origin[2] += bob.verticalBob * 0.1f;
+
+	// bob the angles
+	view->angles[ROLL] += bob.verticalBob * 0.5f;
+	view->angles[PITCH] -= bob.verticalBob * 0.4f;
+
+	view->angles[YAW] -= bob.laterialBob * 0.3f;
+
+	VectorMA(view->origin, bob.laterialBob * 0.8f, pparams->right, view->origin);
 }
 
 /*
@@ -716,12 +775,17 @@ void V_ViewNonClient(struct ref_params_s* pparams)
 	}
 }
 
-void V_CalcWaterOffset(ref_params_t* pparams, float& waterOffset)
+/*
+==================
+V_WaterHackFixApply
+==================
+*/
+float V_CalcWaterOffsetHack(struct ref_params_s* pparams)
 {
 	// never let view origin sit exactly on a node line, because a water plane can
-// dissapear when viewed with the eye exactly on it.
-// FIXME, we send origin at 1/128 now, change this?
-// the server protocol only specifies to 1/16 pixel, so add 1/32 in each axis
+	// dissapear when viewed with the eye exactly on it.
+	// FIXME, we send origin at 1/128 now, change this?
+	// the server protocol only specifies to 1/16 pixel, so add 1/32 in each axis
 
 	pparams->vieworg[0] += 1.0 / 32;
 	pparams->vieworg[1] += 1.0 / 32;
@@ -730,8 +794,7 @@ void V_CalcWaterOffset(ref_params_t* pparams, float& waterOffset)
 	// Check for problems around water, move the viewer artificially if necessary 
 	// -- this prevents drawing errors in GL due to waves
 
-	cl_entity_t* pwater;
-	waterOffset = 0;
+	float waterOffset = 0;
 	if (pparams->waterlevel >= 2)
 	{
 		int		i, contents, waterDist, waterEntity;
@@ -743,7 +806,7 @@ void V_CalcWaterOffset(ref_params_t* pparams, float& waterOffset)
 			waterEntity = gEngfuncs.PM_WaterEntity(pparams->simorg);
 			if (waterEntity >= 0 && waterEntity < pparams->max_entities)
 			{
-				pwater = gEngfuncs.GetEntityByIndex(waterEntity);
+				cl_entity_t* pwater = gEngfuncs.GetEntityByIndex(waterEntity);
 				if (pwater && (pwater->model != NULL))
 				{
 					waterDist += (pwater->curstate.scale * 16);	// Add in wave height
@@ -760,36 +823,50 @@ void V_CalcWaterOffset(ref_params_t* pparams, float& waterOffset)
 		// Eyes are above water, make sure we're above the waves
 		if (pparams->waterlevel == 2)
 		{
-			point[2] -= waterDist / 3.0f;
+			point[2] -= waterDist;
 			for (i = 0; i < waterDist; i++)
 			{
 				contents = gEngfuncs.PM_PointContents(point, NULL);
 				if (contents > CONTENTS_WATER)
 					break;
-				point[2] += 1 / 3.0f;
+				point[2] += 1;
 			}
 			waterOffset = (point[2] + waterDist) - pparams->vieworg[2];
-			waterOffset /= 4.0f;
 		}
 		else
 		{
 			// eyes are under water.  Make sure we're far enough under
-			point[2] += waterDist / 3.0f;
+			point[2] += waterDist;
 
 			for (i = 0; i < waterDist; i++)
 			{
 				contents = gEngfuncs.PM_PointContents(point, NULL);
 				if (contents <= CONTENTS_WATER)
 					break;
-				point[2] -= 1 / 3.0f;
+				point[2] -= 1;
 			}
 			waterOffset = (point[2] - waterDist) - pparams->vieworg[2];
-			waterOffset /= 4.0f;
 		}
 	}
 
-	pparams->vieworg[2] += waterOffset;
+	return waterOffset;
 }
+
+
+#define ORIGIN_BACKUP 64
+#define ORIGIN_MASK ( ORIGIN_BACKUP - 1 )
+
+typedef struct
+{
+	float Origins[ORIGIN_BACKUP][3];
+	float OriginTime[ORIGIN_BACKUP];
+
+	float Angles[ORIGIN_BACKUP][3];
+	float AngleTime[ORIGIN_BACKUP];
+
+	int CurrentOrigin;
+	int CurrentAngle;
+}; // viewinterp_t;
 
 /*
 ==============
@@ -903,7 +980,7 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 
 	// transform the ViewModel offset by the model's matrix to get the offset from
 	// model origin for the ViewModel
-	V_CalcBob(pparams, 1.0, VB_SIN, bobTime, bob, bobLastTime);
+	// V_CalculateBob(pparams, 1.0, VB_SIN, bobTime, bob, bobLastTime);
 
 	// refresh position
 	VectorCopy(pparams->simorg, pparams->vieworg);
@@ -915,7 +992,10 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 	gEngfuncs.V_CalcShake();
 	gEngfuncs.V_ApplyShake(pparams->vieworg, pparams->viewangles, 1.0);
 
-	V_CalcWaterOffset(pparams, waterOffset);
+	float waterOffswt = V_CalcWaterOffsetHack(pparams);
+	pparams->vieworg[2] += waterOffset;
+
+	//V_CalcWaterOffset(pparams, waterOffset);
 	V_CalcViewRoll(pparams);
 
 	V_AddIdle(pparams);
@@ -1185,12 +1265,12 @@ void V_CalcRefdef_ADM(struct ref_params_s* pparams)
 
 	// transform the view offset by the model's matrix to get the offset from
 	// model origin for the view
-	V_CalcBob(pparams, 1.60 * bobFrequencyModifier, VB_SIN, bobtimes[0], v_positionbob, lasttimes[0]);
+	/*V_CalcBob(pparams, 1.60 * bobFrequencyModifier, VB_SIN, bobtimes[0], v_positionbob, lasttimes[0]);
 	V_CalcBob(pparams, 0.8 * bobFrequencyModifier, VB_SIN, bobtimes[1], v_positionbob_sway, lasttimes[1]);
 	V_CalcBob(pparams, rollBobFrequency * bobFrequencyModifier, VB_SIN, bobtimes[2], v_rollbob_y, lasttimes[2]);
 	V_CalcBob(pparams, rollBobFrequency * 2 * bobFrequencyModifier, VB_SIN, bobtimes[3], v_rollbob_p, lasttimes[3]);
 	V_CalcBob(pparams, rollBobFrequency * 2 * bobFrequencyModifier, VB_SIN, bobtimes[4], v_rollbob_r, lasttimes[4]);
-
+	*/
 	v_positionbob *= bobPos;
 	v_positionbob_sway *= bobPosSway;
 
@@ -1210,7 +1290,7 @@ void V_CalcRefdef_ADM(struct ref_params_s* pparams)
 	gEngfuncs.V_CalcShake();
 	gEngfuncs.V_ApplyShake(pparams->vieworg, pparams->viewangles, 1.0);
 
-	V_CalcWaterOffset(pparams, waterOffset);
+	//V_CalcWaterOffset(pparams, waterOffset);
 	V_CalcViewRoll(pparams);
 	V_AddIdle(pparams);
 
@@ -2538,8 +2618,7 @@ void V_Init(void)
 	v_centermove = gEngfuncs.pfnRegisterVariable("v_centermove", "0.15", 0);
 	v_centerspeed = gEngfuncs.pfnRegisterVariable("v_centerspeed", "500", 0);
 
-	cl_bobcycle = gEngfuncs.pfnRegisterVariable("cl_bobcycle", "0.8", 0);// best default for my experimental gun wag (sjb)
-	cl_bob = gEngfuncs.pfnRegisterVariable("cl_bob", "0.01", 0);// best default for my experimental gun wag (sjb)
+	cl_bobcycle_max = gEngfuncs.pfnRegisterVariable("cl_bobcycle_max", "0.45", 0);// best default for my experimental gun wag (sjb)
 	cl_bobup = gEngfuncs.pfnRegisterVariable("cl_bobup", "0.5", 0);
 	cl_waterdist = gEngfuncs.pfnRegisterVariable("cl_waterdist", "4", 0);
 	cl_chasedist = gEngfuncs.pfnRegisterVariable("cl_chasedist", "112", 0);
