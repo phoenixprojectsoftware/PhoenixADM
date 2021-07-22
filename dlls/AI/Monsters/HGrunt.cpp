@@ -945,11 +945,11 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 		case HGRUNT_AE_KICK:
 		{
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_kick.wav", 1, ATTN_NORM);
 			CBaseEntity *pHurt = Kick();
 
 			if ( pHurt )
 			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_kick.wav", 1, ATTN_NORM);
 				UTIL_MakeVectors( pev->angles );
 				pHurt->pev->punchangle.x = 15;
 				pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_forward * 100 + gpGlobals->v_up * 50;
