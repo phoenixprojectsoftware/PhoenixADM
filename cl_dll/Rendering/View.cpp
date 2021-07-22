@@ -869,6 +869,7 @@ V_CalcRefdef
 
 ==================
 */
+float m_flOfs;
 void V_CalcRefdef_HL(struct ref_params_s* pparams)
 {
 	cl_entity_t* ent, * ViewModel;
@@ -932,6 +933,30 @@ void V_CalcRefdef_HL(struct ref_params_s* pparams)
 			pparams->vieworg[i] += scr_ofsx->value * pparams->forward[i] + scr_ofsy->value * pparams->right[i] + scr_ofsz->value * pparams->up[i];
 		}
 	}
+
+	vec3_t pl_vel;
+	VectorCopy(pparams->simvel, pl_vel);
+
+	float m_flSpeed = pl_vel.Length2D();
+
+	if (m_flSpeed > 240.0)
+	{
+		if (m_flOfs <= 3)
+			m_flOfs += 0.15;
+
+		if (m_flOfs >= 3)
+			m_flOfs = 3;
+	}
+	else
+	{
+		if (m_flOfs >= 0)
+			m_flOfs -= 0.1;
+
+		if (m_flOfs <= 0)
+			m_flOfs = 0;
+	}
+
+	pparams->vieworg[2] += m_flOfs;
 
 	// Treating cam_ofs[2] as the distance
 	if (CL_IsThirdPerson())
