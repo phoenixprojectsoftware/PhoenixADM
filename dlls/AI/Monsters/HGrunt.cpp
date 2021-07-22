@@ -951,6 +951,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			{
 				// SOUND HERE!
 				UTIL_MakeVectors( pev->angles );
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_kick.wav", 1, ATTN_NORM);
 				pHurt->pev->punchangle.x = 15;
 				pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_forward * 100 + gpGlobals->v_up * 50;
 				pHurt->TakeDamage( pev, pev, gSkillData.hgruntDmgKick, DMG_CLUB );
