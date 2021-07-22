@@ -250,6 +250,7 @@ int CHud :: DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int
 {
 	char szString[32];
 	sprintf( szString, "%d", iNumber );
+	TRI_SprAdjustSize(&xpos, &ypos, 0, 0);
 	return DrawHudStringReverse( xpos, ypos, iMinX, szString, r, g, b );
 
 }

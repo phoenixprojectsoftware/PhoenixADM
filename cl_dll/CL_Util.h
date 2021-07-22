@@ -41,6 +41,15 @@ inline float CVAR_GET_FLOAT( const char *x ) {	return gEngfuncs.pfnGetCvarFloat(
 inline char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( (char*)x ); }
 inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int flags ) {	return gEngfuncs.pfnRegisterVariable( (char*)cv, (char*)val, flags ); }
 
+extern void TRI_SprSet(HSPRITE spr, int r, int g, int b);
+extern void TRI_SprDrawAdditive(int frame, int x, int y, wrect_t* prc);
+extern void TRI_FillRGBA(int x, int y, int width, int height, int r, int g, int b, int a);
+extern void TRI_SprAdjustSize(int* x, int* y, int* w, int* h);
+
+#define SPR_Set (*TRI_SprSet)
+#define SPR_DrawAdditive (*TRI_SprDrawAdditive)
+#define FillRGBA (*TRI_FillRGBA)
+
 #define LocalConFloat(a) float a = CVAR_GET_FLOAT(#a);
 
 #define SPR_Load (*gEngfuncs.pfnSPR_Load)
@@ -98,6 +107,7 @@ inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, in
 
 inline int DrawConsoleString( int x, int y, const char *string )
 {
+	TRI_SprAdjustSize(&x, &y, 0, 0);
 	return gEngfuncs.pfnDrawConsoleString( x, y, (char*) string );
 }
 
@@ -110,6 +120,11 @@ inline int ConsoleStringLen( const char *string )
 {
 	int _width, _height;
 	GetConsoleStringSize( string, &_width, &_height );
+
+	int w = _width;
+	TRI_SprAdjustSize(0, 0, &w, 0);
+	_width = _width * _width / w;
+
 	return _width;
 }
 

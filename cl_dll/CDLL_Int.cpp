@@ -444,3 +444,7 @@ public:
 };
 
 EXPOSE_SINGLE_INTERFACE(CClientExports, IGameClientExports, GAMECLIENTEXPORTS_INTERFACE_VERSION);
+
+#include "com_model.h"
+
+extern model_s* TRI_pModel;
