@@ -331,6 +331,11 @@ public:
 	float m_flStatusBarDisappearDelay;
 	char m_SbarString0[ SBAR_STRING_SIZE ];
 	char m_SbarString1[ SBAR_STRING_SIZE ];
+
+
+	// BlueNightHawk : Suit Energy Regeneration
+	float m_flNextSuitRegenTime;
+	bool m_fRegenOn;
 	
 	float m_flNextChatTime;
 

@@ -492,6 +492,11 @@ cvar_t	sk_player_leg1	= { "sk_player_leg1","1" };
 cvar_t	sk_player_leg2	= { "sk_player_leg2","1" };
 cvar_t	sk_player_leg3	= { "sk_player_leg3","1" };
 
+// BlueNightHawk : Suit Energy Regneration
+cvar_t sv_regeneration = { "sv_regeneration", "1", FCVAR_SERVER };
+cvar_t sv_regeneration_rate = { "sv_regeneration_rate", "1", FCVAR_SERVER };
+cvar_t sv_regeneration_wait = { "sv_regeneration_wait", "0.05", FCVAR_SERVER };
+
 // END Cvars for Skill Level settings
 
 void PrintVersion()
@@ -944,6 +949,12 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_player_leg1 );
 	CVAR_REGISTER ( &sk_player_leg2 );
 	CVAR_REGISTER ( &sk_player_leg3 );
+
+	// BlueNightHawk : Suit Energy Regeneration
+	CVAR_REGISTER(&sv_regeneration);
+	CVAR_REGISTER(&sv_regeneration_rate);
+	CVAR_REGISTER(&sv_regeneration_wait);
+
 // END REGISTER CVARS FOR SKILL LEVEL STUFF
 
 	SERVER_COMMAND( "exec skill.cfg\n" );

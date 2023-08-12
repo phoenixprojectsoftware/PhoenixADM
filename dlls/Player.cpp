@@ -58,6 +58,11 @@ extern edict_t *EntSelectSpawnPoint( CBaseEntity *pPlayer );
 // the world node graph
 extern CGraph	WorldGraph;
 
+// BlueNightHawk : Suit Energy Regeneration
+extern cvar_t sv_regeneration;
+extern cvar_t sv_regeneration_rate;
+extern cvar_t sv_regeneration_wait;
+
 #define TRAIN_ACTIVE	0x80 
 #define TRAIN_NEW		0xc0
 #define TRAIN_OFF		0x00
@@ -540,7 +545,7 @@ int CBasePlayer :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, 
 		else
 			pev->armorvalue -= flArmor;
 		
-		flDamage = flNew;
+		flDamage = 0;
 	}
 
 	// this cast to INT is critical!!! If a player ends up with 0.5 health, the engine will get that
@@ -709,6 +714,12 @@ int CBasePlayer :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, 
 			else
 				SetSuitUpdate("!HEV_HLTH1", FALSE, SUIT_NEXT_IN_10MIN);	// health dropping
 		}
+
+	// BlueNightHawk : Suit Energy Regeneration
+	if (sv_regeneration.value != 0 && pev->armorvalue < MAX_NORMAL_BATTERY && fTookDamage)
+	{
+		m_flNextSuitRegenTime = gpGlobals->time + 2.75 + sv_regeneration_wait.value;
+	}
 
 	return fTookDamage;
 }
@@ -4083,6 +4094,42 @@ void CBasePlayer :: UpdateClientData( void )
 
 		m_iClientHideHUD = m_iHideHUD;
 	}
+
+	// BlueNightHawk : Suit Energy Regeneration
+	if (sv_regeneration.value != 0 && pev->armorvalue < MAX_NORMAL_BATTERY
+		&& m_flNextSuitRegenTime < gpGlobals->time)
+	{
+		pev->armorvalue += sv_regeneration_rate.value;
+		pev->armorvalue = V_min(pev->armorvalue, MAX_NORMAL_BATTERY);
+
+		if (pev->armorvalue == MAX_NORMAL_BATTERY)
+		{
+			m_flNextSuitRegenTime = 0.0f;
+			m_fRegenOn = false;
+			STOP_SOUND(ENT(pev), CHAN_STATIC, "items/suitcharge1.wav");
+			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/suitchargeno1.wav", 0.85, ATTN_NORM);
+		}
+		else if (!m_fRegenOn)
+		{
+			m_fRegenOn = true;
+			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/suitchargeok1.wav", 0.85, ATTN_NORM);
+		}
+		else
+		{
+			STOP_SOUND(ENT(pev), CHAN_STATIC, "items/suitcharge1.wav");
+			// too loud
+			EMIT_SOUND(ENT(pev), CHAN_STATIC, "items/suitcharge1.wav", 0.25, ATTN_NORM);
+		}
+
+		m_flNextSuitRegenTime = gpGlobals->time + sv_regeneration_wait.value;
+	}
+	else if (sv_regeneration.value == 0)
+	{
+		m_flNextSuitRegenTime = 0.0f;
+		m_fRegenOn = false;
+		m_fRegenOn = false;
+	}
+
 
 	if ( m_iFOV != m_iClientFOV )
 	{
